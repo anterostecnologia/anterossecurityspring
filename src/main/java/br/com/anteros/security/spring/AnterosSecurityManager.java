@@ -29,7 +29,7 @@ import br.com.anteros.security.model.Action;
 import br.com.anteros.security.model.Resource;
 import br.com.anteros.security.model.System;
 
-@Component
+@Component("anterosSecurityManager")
 @ComponentScan("br.com.anteros.security.spring")
 @SuppressWarnings("deprecation")
 public class AnterosSecurityManager implements AuthenticationProvider, InitializingBean {
