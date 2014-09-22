@@ -47,7 +47,8 @@ public class AnterosSecurityVoter implements AccessDecisionVoter {
 			if (this.supports(configAttribute)) {
 				result = ACCESS_DENIED;
 
-				String systemName = EMPTY_SYSTEM;
+				AnterosSecurityUser principal = (AnterosSecurityUser) authentication.getPrincipal();
+				String systemName = principal.getSystemName();
 				String resourceName = EMPTY_RESOURCE;
 				String actionName = configAttribute.getAttribute();
 				boolean requiresAdmin = false;
@@ -55,15 +56,14 @@ public class AnterosSecurityVoter implements AccessDecisionVoter {
 				if (object instanceof ReflectiveMethodInvocation) {
 					Method method = ((ReflectiveMethodInvocation) object).getMethod();
 					Class<?> declaringClass = method.getDeclaringClass();
-					if (declaringClass.isAnnotationPresent(AnterosSecurityResource.class)) {
-						AnterosSecurityResource annotation = declaringClass
-								.getAnnotation(AnterosSecurityResource.class);
-						systemName = annotation.systemName();
+					if (declaringClass.isAnnotationPresent(ResourceSecured.class)) {
+						ResourceSecured annotation = declaringClass
+								.getAnnotation(ResourceSecured.class);
 						resourceName = annotation.resourceName();
 					}
-					if (method.isAnnotationPresent(AnterosSecured.class)) {
-						AnterosSecured secured = method.getAnnotation(AnterosSecured.class);
-						actionName = secured.value();
+					if (method.isAnnotationPresent(ActionSecured.class)) {
+						ActionSecured secured = method.getAnnotation(ActionSecured.class);
+						actionName = secured.actionName();
 						requiresAdmin = secured.requiresAdmin();
 					}
 				}
@@ -73,7 +73,6 @@ public class AnterosSecurityVoter implements AccessDecisionVoter {
 					return ACCESS_DENIED;
 				}
 
-				AnterosSecurityUser principal = (AnterosSecurityUser) authentication.getPrincipal();
 				if (requiresAdmin && (!principal.isAdmin()))
 					return ACCESS_DENIED;
 

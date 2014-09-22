@@ -2,51 +2,52 @@ package br.com.anteros.security.spring;
 
 import org.springframework.security.core.GrantedAuthority;
 
-import br.com.anteros.core.utils.Assert;
+import br.com.anteros.security.model.Action;
 
 public class AnterosSecurityGrantedAuthority implements GrantedAuthority {
 
 	private static final long serialVersionUID = 1L;
-	private final String systemName;
-	private final String resourceName;
-	private final String actionName;
-
-	public AnterosSecurityGrantedAuthority(String systemName, String resourceName, String actionName) {
-		Assert.hasText(systemName, "The name of system is required for AnterosSecurityGrantedAuthority");
-		Assert.hasText(resourceName, "The name of resource is required for AnterosSecurityGrantedAuthority");
-		Assert.hasText(actionName, "The name of action is required for AnterosSecurityGrantedAuthority");
-		this.systemName = systemName;
-		this.resourceName = resourceName;
-		this.actionName = actionName;
+	private Action action;
+	
+	public AnterosSecurityGrantedAuthority(Action action) {
+		this.action = action;
 	}
 
 	public String getAuthority() {
-		return this.actionName;
+		return this.action.getNome();
 	}
 
 	public String getSystemName() {
-		return systemName;
+		return this.action.getRecurso().getSistema().getNome();
 	}
 
 	public String getResourceName() {
-		return resourceName;
+		return this.action.getRecurso().getNome();
 	}
 
 	public String getActionName() {
-		return actionName;
+		return this.action.getNome();
 	}
 
 	public boolean equalsTo(String systemName, String resourceName, String actionName) {
-		if (!systemName.equalsIgnoreCase(this.systemName))
+		if (!systemName.equalsIgnoreCase(this.getSystemName()))
 			return false;
 
-		if (!resourceName.equalsIgnoreCase(this.resourceName))
+		if (!resourceName.equalsIgnoreCase(this.getResourceName()))
 			return false;
 
-		if (!actionName.equalsIgnoreCase(this.actionName))
+		if (!actionName.equalsIgnoreCase(this.getActionName()))
 			return false;
 
 		return true;
+	}
+
+	public Action getAction() {
+		return action;
+	}
+
+	public void setAction(Action action) {
+		this.action = action;
 	}
 
 }
