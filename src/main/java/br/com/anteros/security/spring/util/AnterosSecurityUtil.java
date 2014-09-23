@@ -24,13 +24,14 @@ public final class AnterosSecurityUtil {
 		SecurityContextHolder.getContext().setAuthentication(null);
 	}
 
-	public static void manualAuthentication(UserDetails user, String systemName, String version) {
+	public static void manualAuthentication(UserDetails user, String systemName, String version, boolean adminNeedsPermission) {
 		if (user == null) {
 			throw new BadCredentialsException("Username is required.");
 		}
 
 		((AnterosSecurityUser) user).setSystemName(systemName);
 		((AnterosSecurityUser) user).setVersion(version);
+		((AnterosSecurityUser) user).setAdminNeedsPermission(adminNeedsPermission);
 
 		Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
 		SecurityContextHolder.getContext().setAuthentication(

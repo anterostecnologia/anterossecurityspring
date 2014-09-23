@@ -65,7 +65,7 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 			anterosSystemRepository.getSession().getTransaction().commit();
 		} catch (Exception e) {
 			anterosSystemRepository.getSession().getTransaction().rollback();
-			throw new AnterosSecurityException(e);
+			throw new AnterosSecurityException("Não foi possível salvar o sistema "+systemName+". "+e.getMessage(), e);
 		}
 
 		return system;
@@ -82,7 +82,7 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 			anterosResourceRepository.getSession().getTransaction().commit();
 		} catch (Exception e) {
 			anterosResourceRepository.getSession().getTransaction().rollback();
-			throw new AnterosSecurityException(e);
+			throw new AnterosSecurityException("Não foi possível salvar o recurso "+resourceName+". "+e.getMessage(),e);
 		}
 
 		return resource;
@@ -102,7 +102,7 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 			anterosActionRepository.getSession().getTransaction().commit();
 		} catch (Exception e) {
 			anterosActionRepository.getSession().getTransaction().rollback();
-			throw new AnterosSecurityException(e);
+			throw new AnterosSecurityException("Não foi possível salvar a ação "+actionName+". "+e.getMessage(),e);
 		}
 		return action;
 	}
