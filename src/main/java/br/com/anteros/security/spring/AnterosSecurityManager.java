@@ -12,6 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.dao.SaltSource;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.security.authentication.encoding.PlaintextPasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,7 +39,8 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 	protected String systemName;
 	protected String description;
 	protected String version;
-	private PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
+	protected boolean adminNeedsPermission = true;
+	private PasswordEncoder passwordEncoder = new PlaintextPasswordEncoder();
 	private SaltSource saltSource;
 	private static Logger LOG = LoggerProvider.getInstance().getLogger(AnterosSecurityManager.class.getName());
 
@@ -73,6 +75,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 		((AnterosSecurityUser) user).setSystemName(systemName);
 		((AnterosSecurityUser) user).setVersion(version);
+		((AnterosSecurityUser) user).setAdminNeedsPermission(adminNeedsPermission);
 
 		Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
 
@@ -239,6 +242,14 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 	public void setSaltSource(SaltSource saltSource) {
 		this.saltSource = saltSource;
+	}
+
+	public boolean isAdminNeedsPermission() {
+		return adminNeedsPermission;
+	}
+
+	public void setAdminNeedsPermission(boolean adminNeedsPermission) {
+		this.adminNeedsPermission = adminNeedsPermission;
 	}
 
 }

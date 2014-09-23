@@ -39,6 +39,11 @@ public class AnterosSecurityVoter implements AccessDecisionVoter {
 	}
 
 	public int vote(Authentication authentication, Object object, Collection attributes) {
+		AnterosSecurityUser principal = (AnterosSecurityUser) authentication.getPrincipal();
+		if (!principal.isAdminNeedsPermission()){
+			return ACCESS_GRANTED;
+		}
+		
 		int result = ACCESS_ABSTAIN;
 		Collection<? extends GrantedAuthority> authorities = extractAuthorities(authentication);
 
@@ -47,7 +52,7 @@ public class AnterosSecurityVoter implements AccessDecisionVoter {
 			if (this.supports(configAttribute)) {
 				result = ACCESS_DENIED;
 
-				AnterosSecurityUser principal = (AnterosSecurityUser) authentication.getPrincipal();
+				
 				String systemName = principal.getSystemName();
 				String resourceName = EMPTY_RESOURCE;
 				String actionName = configAttribute.getAttribute();

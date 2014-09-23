@@ -1,9 +1,7 @@
 package br.com.anteros.security.spring;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +16,7 @@ public class AnterosSecurityUser implements UserDetails {
 	private User internalUser;
 	private String systemName;
 	private String version;
+	private boolean adminNeedsPermission = true;
 	private Set<AnterosSecurityGrantedAuthority> actions;
 
 	public AnterosSecurityUser(User user) {
@@ -84,6 +83,14 @@ public class AnterosSecurityUser implements UserDetails {
 
 	public void setVersion(String version) {
 		this.version = version;
+	}
+
+	public boolean isAdminNeedsPermission() {
+		return adminNeedsPermission;
+	}
+
+	public void setAdminNeedsPermission(boolean adminNeedsPermission) {
+		this.adminNeedsPermission = adminNeedsPermission;
 	}
 
 }
