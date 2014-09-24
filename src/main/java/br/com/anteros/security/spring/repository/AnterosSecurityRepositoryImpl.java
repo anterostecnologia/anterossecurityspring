@@ -19,7 +19,6 @@ public class AnterosSecurityRepositoryImpl extends GenericSQLRepository<Security
 	@Autowired
 	public AnterosSecurityRepositoryImpl(@Qualifier("sessionFactory") SQLSessionFactory sessionFactory) throws Exception {
 		super(sessionFactory);
-		this.setSession(sessionFactory.openSession());
 	}
 
 	public User findUserByName(String userName) {

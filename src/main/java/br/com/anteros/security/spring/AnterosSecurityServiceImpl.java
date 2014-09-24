@@ -1,11 +1,13 @@
 package br.com.anteros.security.spring;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import br.com.anteros.persistence.parameter.NamedParameter;
+import br.com.anteros.persistence.session.SQLSession;
 import br.com.anteros.persistence.session.service.GenericSQLService;
 import br.com.anteros.security.model.Action;
 import br.com.anteros.security.model.Resource;
@@ -18,7 +20,7 @@ import br.com.anteros.security.spring.repository.AnterosSecurityRepository;
 import br.com.anteros.security.spring.repository.AnterosSystemRepository;
 
 @Service("anterosSecurityService")
-public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long> implements AnterosSecurityService {
+public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long> implements AnterosSecurityService, InitializingBean {
 
 	@Autowired
 	protected AnterosSecurityRepository anterosSecurityRepository;
@@ -137,6 +139,14 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 			anterosActionRepository.getSession().getTransaction().rollback();
 			throw new AnterosSecurityException(e);
 		}
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		SQLSession session = anterosSecurityRepository.getSQLSessionFactory().openSession();
+		anterosSecurityRepository.setSession(session);
+		anterosActionRepository.setSession(session);
+		anterosResourceRepository.setSession(session);
+		anterosSystemRepository.setSession(session);
 	}
 
 

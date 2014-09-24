@@ -16,7 +16,6 @@ public class AnterosSystemRepositoryImpl extends GenericSQLRepository<System, Lo
 	@Autowired
 	public AnterosSystemRepositoryImpl(@Qualifier("sessionFactory") SQLSessionFactory sessionFactory) throws Exception {
 		super(sessionFactory);
-		this.setSession(sessionFactory.openSession());
 	}
 
 }
