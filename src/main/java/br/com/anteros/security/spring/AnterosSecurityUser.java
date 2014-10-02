@@ -13,60 +13,72 @@ import br.com.anteros.security.model.User;
 public class AnterosSecurityUser implements UserDetails {
 
 	private static final long serialVersionUID = 1L;
-	private User internalUser;
+	private String userName;
+	private String password;
 	private String systemName;
 	private String version;
 	private boolean adminNeedsPermission = true;
 	private Set<AnterosSecurityGrantedAuthority> actions;
+	private boolean accountExpired;
+	private boolean accountLocked;
+	private boolean accountInactive;
+	private boolean admin;
 
 	public AnterosSecurityUser(User user) {
-		this.internalUser = user;
+		makeUser(user);
+		user=null;
 	}
 
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		if (actions == null) {
-			actions = new HashSet<AnterosSecurityGrantedAuthority>();
-			for (Action action : internalUser.getAcoes()) {
+	private void makeUser(User user) {
+		this.userName = user.getLogin();
+		this.password = user.getSenha();
+		this.accountExpired = user.isExpirada();
+		this.accountInactive = user.getContaDesativada();
+		this.accountLocked = user.getContaBloqueada();
+		this.admin = user.getBoAdministrador();
+		actions = new HashSet<AnterosSecurityGrantedAuthority>();
+		for (Action action : user.getAcoes()) {
+			if (action.getRecurso().getSistema().getNome().equalsIgnoreCase(systemName))
+				actions.add(new AnterosSecurityGrantedAuthority(action));
+		}
+		if (user.getPerfil() != null) {
+			for (Action action : user.getPerfil().getAcoes()) {
 				if (action.getRecurso().getSistema().getNome().equalsIgnoreCase(systemName))
 					actions.add(new AnterosSecurityGrantedAuthority(action));
 			}
-			if (internalUser.getPerfil() != null) {
-				for (Action action : internalUser.getPerfil().getAcoes()) {
-					if (action.getRecurso().getSistema().getNome().equalsIgnoreCase(systemName))
-						actions.add(new AnterosSecurityGrantedAuthority(action));
-				}
-			}
 		}
+	}
 
+	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return actions;
 	}
 
 	public String getPassword() {
-		return internalUser.getSenha();
+		return password;
 	}
 
 	public String getUsername() {
-		return internalUser.getLogin();
+		return userName;
 	}
 
 	public boolean isAccountNonExpired() {
-		return (!internalUser.isExpirada());
+		return !accountExpired;
 	}
 
 	public boolean isAccountNonLocked() {
-		return !internalUser.getContaBloqueada();
+		return !accountLocked;
 	}
 
 	public boolean isCredentialsNonExpired() {
-		return (!internalUser.isExpirada());
+		return !accountExpired;
 	}
 
 	public boolean isEnabled() {
-		return (!internalUser.getContaBloqueada() && (!internalUser.getContaDesativada()));
+		return (!accountLocked && (!accountInactive));
 	}
 
 	public boolean isAdmin() {
-		return internalUser.getBoAdministrador();
+		return admin;
 	}
 
 	public String getSystemName() {

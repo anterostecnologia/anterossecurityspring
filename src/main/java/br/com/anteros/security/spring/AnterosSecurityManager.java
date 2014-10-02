@@ -49,6 +49,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 	
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+		LOG.debug("Authenticate user "+authentication);
 		String username = authentication.getName();
 		UserDetails user = anterosSecurityService.loadUserByUsername(username);
 		if (user == null) {
@@ -91,7 +92,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 				"Para o correto funcionamento da segurança da aplicação é necessário informar o nome do sistema.");
 		Assert.notNull(version,
 				"Para o correto funcionamento da segurança da aplicação é necessário informar a versão do sistema.");
-		scanPackages();
+		//scanPackages();
 	}
 
 	protected void scanPackages() {
@@ -107,6 +108,8 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 	protected void loadSecuredResourcesAndActions(List<Class<?>> classes) {
 		try {
+			Action action=null;
+			Resource resource = null; 
 			System system = anterosSecurityService.getSystemByName(systemName);
 			if (system == null) {
 				system = anterosSecurityService.addSystem(systemName, description);
@@ -115,7 +118,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 				if (cl.isAnnotationPresent(ResourceSecured.class)) {
 					ResourceSecured resourceSecured = cl.getAnnotation(ResourceSecured.class);
 
-					Resource resource = anterosSecurityService.getResourceByName(systemName,
+					resource = anterosSecurityService.getResourceByName(systemName,
 							resourceSecured.resourceName());
 					if (resource == null) {
 						resource = anterosSecurityService.addResource(system, resourceSecured.resourceName(),
@@ -127,11 +130,12 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 					 * Verifica ações declaradas e não salvas ou inativas
 					 */
 					Method[] methods = ReflectionUtils.getAllDeclaredMethods(cl);
+					
 					for (Method method : methods) {
 						if (method.isAnnotationPresent(ActionSecured.class)) {
 							boolean found = false;
 							boolean active = false;
-							Action action = null;
+							action = null;
 							ActionSecured actionSecured = method.getAnnotation(ActionSecured.class);
 							for (Action act : resource.getAcoes()) {
 								if (act.getNome().equalsIgnoreCase(actionSecured.actionName())) {

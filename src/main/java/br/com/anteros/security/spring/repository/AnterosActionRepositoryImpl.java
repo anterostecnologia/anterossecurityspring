@@ -10,7 +10,7 @@ import br.com.anteros.persistence.session.repository.impl.GenericSQLRepository;
 import br.com.anteros.security.model.Action;
 
 @Repository("anterosActionRepository")
-@Scope("prototype")
+@Scope("singleton")
 public class AnterosActionRepositoryImpl extends GenericSQLRepository<Action, Long> implements AnterosActionRepository {
 
 	@Autowired

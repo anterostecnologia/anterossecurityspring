@@ -7,26 +7,38 @@ import br.com.anteros.security.model.Action;
 public class AnterosSecurityGrantedAuthority implements GrantedAuthority {
 
 	private static final long serialVersionUID = 1L;
-	private Action action;
+	
+	private String authoriy;
+	private String systemName;
+	private String resourceName;
+	private String actionName;
+	
 	
 	public AnterosSecurityGrantedAuthority(Action action) {
-		this.action = action;
+		makeAuthority(action);
+	}
+
+	private void makeAuthority(Action action) {
+		this.authoriy = action.getNome();
+		this.systemName = action.getRecurso().getSistema().getNome();
+		this.resourceName = action.getRecurso().getNome();
+		this.actionName = action.getNome();
 	}
 
 	public String getAuthority() {
-		return this.action.getNome();
+		return authoriy;
 	}
 
 	public String getSystemName() {
-		return this.action.getRecurso().getSistema().getNome();
+		return systemName;
 	}
 
 	public String getResourceName() {
-		return this.action.getRecurso().getNome();
+		return resourceName;
 	}
 
 	public String getActionName() {
-		return this.action.getNome();
+		return actionName;
 	}
 
 	public boolean equalsTo(String systemName, String resourceName, String actionName) {
@@ -40,14 +52,6 @@ public class AnterosSecurityGrantedAuthority implements GrantedAuthority {
 			return false;
 
 		return true;
-	}
-
-	public Action getAction() {
-		return action;
-	}
-
-	public void setAction(Action action) {
-		this.action = action;
 	}
 
 }

@@ -12,7 +12,7 @@ import br.com.anteros.security.model.Security;
 import br.com.anteros.security.model.User;
 
 @Repository("anterosSecurityRepository")
-@Scope("prototype")
+@Scope("singleton")
 public class AnterosSecurityRepositoryImpl extends GenericSQLRepository<Security, Long> implements
 		AnterosSecurityRepository {
 

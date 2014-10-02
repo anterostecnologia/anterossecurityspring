@@ -26,4 +26,5 @@ public interface AnterosSecurityService extends UserDetailsService, SQLService<S
 
 	public void removeActionByAllUsers(Action act) throws Exception;
 	
+	
 }

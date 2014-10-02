@@ -1,5 +1,8 @@
 package br.com.anteros.security.spring;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +23,8 @@ import br.com.anteros.security.spring.repository.AnterosSecurityRepository;
 import br.com.anteros.security.spring.repository.AnterosSystemRepository;
 
 @Service("anterosSecurityService")
-public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long> implements AnterosSecurityService, InitializingBean {
+public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long> implements AnterosSecurityService,
+		InitializingBean {
 
 	@Autowired
 	protected AnterosSecurityRepository anterosSecurityRepository;
@@ -34,11 +38,19 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 	@Autowired
 	protected AnterosActionRepository anterosActionRepository;
 
+	private Map<String, AnterosSecurityUser> cacheUsers = new HashMap<String, AnterosSecurityUser>();
+
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = anterosSecurityRepository.findUserByName(username);
-		if (user == null)
-			return null;
-		return new AnterosSecurityUser(user);
+		AnterosSecurityUser result = cacheUsers.get(username);
+		if (result == null) {
+			User user = anterosSecurityRepository.findUserByName(username);
+			if (user == null)
+				return null;
+			result = new AnterosSecurityUser(user);
+			user = null;
+			cacheUsers.put(username, result);
+		}
+		return result;
 	}
 
 	public Resource getResourceByName(String systemName, String resourceName) {
@@ -67,7 +79,8 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 			anterosSystemRepository.getSession().getTransaction().commit();
 		} catch (Exception e) {
 			anterosSystemRepository.getSession().getTransaction().rollback();
-			throw new AnterosSecurityException("Não foi possível salvar o sistema "+systemName+". "+e.getMessage(), e);
+			throw new AnterosSecurityException("Não foi possível salvar o sistema " + systemName + ". "
+					+ e.getMessage(), e);
 		}
 
 		return system;
@@ -84,7 +97,8 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 			anterosResourceRepository.getSession().getTransaction().commit();
 		} catch (Exception e) {
 			anterosResourceRepository.getSession().getTransaction().rollback();
-			throw new AnterosSecurityException("Não foi possível salvar o recurso "+resourceName+". "+e.getMessage(),e);
+			throw new AnterosSecurityException("Não foi possível salvar o recurso " + resourceName + ". "
+					+ e.getMessage(), e);
 		}
 
 		return resource;
@@ -104,7 +118,8 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 			anterosActionRepository.getSession().getTransaction().commit();
 		} catch (Exception e) {
 			anterosActionRepository.getSession().getTransaction().rollback();
-			throw new AnterosSecurityException("Não foi possível salvar a ação "+actionName+". "+e.getMessage(),e);
+			throw new AnterosSecurityException("Não foi possível salvar a ação " + actionName + ". " + e.getMessage(),
+					e);
 		}
 		return action;
 	}
@@ -148,6 +163,5 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 		anterosResourceRepository.setSession(session);
 		anterosSystemRepository.setSession(session);
 	}
-
 
 }
