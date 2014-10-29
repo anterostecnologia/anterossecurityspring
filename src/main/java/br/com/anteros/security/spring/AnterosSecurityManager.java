@@ -92,7 +92,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 				"Para o correto funcionamento da segurança da aplicação é necessário informar o nome do sistema.");
 		Assert.notNull(version,
 				"Para o correto funcionamento da segurança da aplicação é necessário informar a versão do sistema.");
-		//scanPackages();
+		scanPackages();
 	}
 
 	protected void scanPackages() {
