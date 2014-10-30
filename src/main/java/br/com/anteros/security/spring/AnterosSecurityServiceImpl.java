@@ -52,6 +52,19 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 		}
 		return result;
 	}
+	
+	public UserDetails loadUserByUsername(String username, String systemName) throws UsernameNotFoundException {
+		AnterosSecurityUser result = cacheUsers.get(username);
+		if (result == null) {
+			User user = anterosSecurityRepository.findUserByName(username);
+			if (user == null)
+				return null;
+			result = new AnterosSecurityUser(user, systemName);
+			user = null;
+			cacheUsers.put(username, result);
+		}
+		return result;
+	}
 
 	public Resource getResourceByName(String systemName, String resourceName) {
 		Resource resource = anterosResourceRepository

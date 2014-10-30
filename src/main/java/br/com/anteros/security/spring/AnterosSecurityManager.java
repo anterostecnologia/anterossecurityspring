@@ -51,7 +51,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		LOG.debug("Authenticate user "+authentication);
 		String username = authentication.getName();
-		UserDetails user = anterosSecurityService.loadUserByUsername(username);
+		UserDetails user = anterosSecurityService.loadUserByUsername(username, systemName);
 		if (user == null) {
 			throw new BadCredentialsException("Username not found.");
 		}

@@ -28,6 +28,12 @@ public class AnterosSecurityUser implements UserDetails {
 		makeUser(user);
 		user=null;
 	}
+	
+	public AnterosSecurityUser(User user, String systemName) {
+		this.systemName = systemName;
+		makeUser(user);
+		user=null;
+	}
 
 	private void makeUser(User user) {
 		this.userName = user.getLogin();
@@ -38,12 +44,12 @@ public class AnterosSecurityUser implements UserDetails {
 		this.admin = user.getBoAdministrador();
 		actions = new HashSet<AnterosSecurityGrantedAuthority>();
 		for (Action action : user.getAcoes()) {
-			if (action.getRecurso().getSistema().getNome().equalsIgnoreCase(systemName))
+			if ((systemName==null) || (action.getRecurso().getSistema().getNome().equalsIgnoreCase(systemName)))
 				actions.add(new AnterosSecurityGrantedAuthority(action));
 		}
 		if (user.getPerfil() != null) {
 			for (Action action : user.getPerfil().getAcoes()) {
-				if (action.getRecurso().getSistema().getNome().equalsIgnoreCase(systemName))
+				if ((systemName==null) || (action.getRecurso().getSistema().getNome().equalsIgnoreCase(systemName)))
 					actions.add(new AnterosSecurityGrantedAuthority(action));
 			}
 		}

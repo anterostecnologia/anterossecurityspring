@@ -1,6 +1,8 @@
 package br.com.anteros.security.spring;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import br.com.anteros.persistence.session.service.SQLService;
 import br.com.anteros.security.model.Action;
@@ -25,6 +27,8 @@ public interface AnterosSecurityService extends UserDetailsService, SQLService<S
 	public Resource refreshResource(Resource resource) throws Exception;
 
 	public void removeActionByAllUsers(Action act) throws Exception;
+	
+	UserDetails loadUserByUsername(String username, String systemName) throws UsernameNotFoundException;
 	
 	
 }
