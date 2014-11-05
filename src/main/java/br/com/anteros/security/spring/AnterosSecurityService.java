@@ -9,6 +9,7 @@ import br.com.anteros.security.model.Action;
 import br.com.anteros.security.model.Resource;
 import br.com.anteros.security.model.Security;
 import br.com.anteros.security.model.System;
+import br.com.anteros.security.model.User;
 
 public interface AnterosSecurityService extends UserDetailsService, SQLService<Security, Long> {
 
@@ -28,7 +29,9 @@ public interface AnterosSecurityService extends UserDetailsService, SQLService<S
 
 	public void removeActionByAllUsers(Action act) throws Exception;
 	
-	UserDetails loadUserByUsername(String username, String systemName) throws UsernameNotFoundException;
+	public UserDetails loadUserByUsername(String username, String systemName) throws UsernameNotFoundException;
+	
+	public User getUserByUserName(String username);
 	
 	
 }
