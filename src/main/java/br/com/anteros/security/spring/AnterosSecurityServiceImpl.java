@@ -177,4 +177,8 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 		anterosSystemRepository.setSession(session);
 	}
 
+	
+	public User getUserByUserName(String username){
+		return anterosSecurityRepository.findUserByName(username);
+	}
 }
