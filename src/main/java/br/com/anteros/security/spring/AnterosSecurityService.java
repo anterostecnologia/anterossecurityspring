@@ -28,7 +28,7 @@ import br.com.anteros.security.model.User;
 
 /**
  * 
- * @author Edson Martins
+ * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
 public interface AnterosSecurityService extends UserDetailsService, SQLService<Security, Long> {

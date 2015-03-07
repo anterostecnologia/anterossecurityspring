@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * Extensão para uso no módulo de seguranção Anteros via Spring.
  * 
- * @author Edson Martins
+ * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
 @Component("anterosSecurityMethodAccessDecisionManager")

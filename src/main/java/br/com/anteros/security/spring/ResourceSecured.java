@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 
 /**
  * 
- * @author Edson Martins
+ * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
 @Target(value = ElementType.TYPE)

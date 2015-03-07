@@ -27,7 +27,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 /**
  * 
- * @author Edson Martins
+ * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
 @SuppressWarnings("rawtypes")

@@ -18,7 +18,7 @@ package br.com.anteros.security.spring;
 /**
  * Exceção de segurança do anteros
  * 
- * @author Edson Martins
+ * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
 public class AnterosSecurityException extends RuntimeException {

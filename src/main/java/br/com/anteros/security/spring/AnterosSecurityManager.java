@@ -47,7 +47,7 @@ import br.com.anteros.security.model.System;
 
 /**
  * 
- * @author Edson Martins
+ * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
 @Component("anterosSecurityManager")

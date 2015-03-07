@@ -27,7 +27,7 @@ import org.springframework.security.access.annotation.Secured;
 /**
  * Anotação herdada de {@link Secured}
  * 
- * @author Edson Martins
+ * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
 @Target({ElementType.METHOD})

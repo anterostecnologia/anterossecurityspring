@@ -28,7 +28,7 @@ import br.com.anteros.security.model.User;
 /**
  * Representação de um usuário dentro do sistema de segurança do Anteros.
  * 
- * @author Edson Martins
+ * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
 public class AnterosSecurityUser implements UserDetails {

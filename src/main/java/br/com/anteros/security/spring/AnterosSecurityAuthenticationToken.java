@@ -23,7 +23,7 @@ import org.springframework.security.core.GrantedAuthority;
 /**
  * Extensão do token de autenticação do Spring para validação via usuário/senha pelo Anteros.
  * 
- * @author Edson Martins
+ * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
 public class AnterosSecurityAuthenticationToken extends UsernamePasswordAuthenticationToken{

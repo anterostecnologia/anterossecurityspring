@@ -21,7 +21,7 @@ import br.com.anteros.security.model.Action;
 
 /**
  * 
- * @author Edson Martins
+ * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
 public class AnterosSecurityGrantedAuthority implements GrantedAuthority {

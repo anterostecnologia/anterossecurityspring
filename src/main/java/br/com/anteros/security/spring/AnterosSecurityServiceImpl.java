@@ -39,7 +39,7 @@ import br.com.anteros.security.spring.repository.AnterosSystemRepository;
 
 /**
  * 
- * @author Edson Martins
+ * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
 @Service("anterosSecurityService")
