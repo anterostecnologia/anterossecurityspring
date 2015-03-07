@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2012 Anteros Tecnologia
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package br.com.anteros.security.spring;
 
 import java.util.HashMap;
@@ -22,6 +37,11 @@ import br.com.anteros.security.spring.repository.AnterosResourceRepository;
 import br.com.anteros.security.spring.repository.AnterosSecurityRepository;
 import br.com.anteros.security.spring.repository.AnterosSystemRepository;
 
+/**
+ * 
+ * @author Edson Martins
+ *
+ */
 @Service("anterosSecurityService")
 public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long> implements AnterosSecurityService,
 		InitializingBean {
@@ -67,6 +87,7 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 	}
 
 	public Resource getResourceByName(String systemName, String resourceName) {
+		//TODO  Trocar por consulta via DSL para evitar problemas com nomes.
 		Resource resource = anterosResourceRepository
 				.findOne(
 						"select rec.* from SEGURANCARECURSO rec, SEGURANCASISTEMA sis where sis.nome_sistema = :pnome_sistema and rec.nome_recurso = :pnome_recurso and rec.id_sistema = sis.id_sistema ",
@@ -76,6 +97,7 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 	}
 
 	public System getSystemByName(String systemName) {
+		//TODO  Trocar por consulta via DSL para evitar problemas com nomes.
 		System system = anterosSystemRepository.findOne(
 				"select sis.* from SEGURANCASISTEMA sis where sis.nome_sistema = :pnome_sistema", new NamedParameter(
 						"pnome_sistema", systemName));
@@ -157,6 +179,7 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 	public void removeActionByAllUsers(Action act) throws Exception {
 		try {
 			anterosActionRepository.getSession().getTransaction().begin();
+			//TODO  Trocar por consulta via DSL para evitar problemas com nomes.
 			anterosActionRepository
 					.getSession()
 					.createQuery("delete from SEGURANCAACAOACAO where id_acao = :pid_acao",
