@@ -25,7 +25,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.dao.SaltSource;
-import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.authentication.encoding.PlaintextPasswordEncoder;
 import org.springframework.security.core.Authentication;
@@ -43,7 +42,7 @@ import br.com.anteros.core.utils.ReflectionUtils;
 import br.com.anteros.core.utils.StringUtils;
 import br.com.anteros.security.model.Action;
 import br.com.anteros.security.model.Resource;
-import br.com.anteros.security.model.System;
+
 
 /**
  * 
@@ -130,7 +129,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 		try {
 			Action action=null;
 			Resource resource = null; 
-			System system = anterosSecurityService.getSystemByName(systemName);
+			br.com.anteros.security.model.System system = anterosSecurityService.getSystemByName(systemName);
 			if (system == null) {
 				system = anterosSecurityService.addSystem(systemName, description);
 			}
