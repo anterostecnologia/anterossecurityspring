@@ -15,7 +15,6 @@
  *******************************************************************************/
 package br.com.anteros.security.spring;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,7 +23,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
 
 /**
  * Extensão para uso no módulo de seguranção Anteros via Spring.
@@ -32,49 +30,50 @@ import org.springframework.stereotype.Component;
  * @author Edson Martins edsonmartins2005@gmail.com
  *
  */
-@Component("anterosSecurityMethodAccessDecisionManager")
-public class AnterosSecurityAccessDecisionManager extends AbstractAccessDecisionManager   {
+@SuppressWarnings({ "rawtypes", "deprecation" })
+public class AnterosSecurityAccessDecisionManager extends AbstractAccessDecisionManager {
 
-	@SuppressWarnings({ "rawtypes", "deprecation" })
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		List<AccessDecisionVoter> list = new ArrayList<AccessDecisionVoter>();
-		list.add(new AnterosSecurityVoter());
-		setDecisionVoters(list);
-		super.afterPropertiesSet();		
+		super.afterPropertiesSet();
 	}
-	
+
+
+	public AnterosSecurityAccessDecisionManager(List<AccessDecisionVoter<? extends Object>> decisionVoters) {
+		super(decisionVoters);
+	}
+
 	public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes)
-            throws AccessDeniedException {
-        int deny = 0;
+			throws AccessDeniedException {
+		int deny = 0;
 
-        for (AccessDecisionVoter voter : getDecisionVoters()) {
-            int result = voter.vote(authentication, object, configAttributes);
+		for (AccessDecisionVoter voter : getDecisionVoters()) {
+			int result = voter.vote(authentication, object, configAttributes);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Voter: " + voter + ", returned: " + result);
-            }
+			if (logger.isDebugEnabled()) {
+				logger.debug("Voter: " + voter + ", returned: " + result);
+			}
 
-            switch (result) {
-            case AccessDecisionVoter.ACCESS_GRANTED:
-                return;
+			switch (result) {
+			case AccessDecisionVoter.ACCESS_GRANTED:
+				return;
 
-            case AccessDecisionVoter.ACCESS_DENIED:
-                deny++;
+			case AccessDecisionVoter.ACCESS_DENIED:
+				deny++;
 
-                break;
+				break;
 
-            default:
-                break;
-            }
-        }
+			default:
+				break;
+			}
+		}
 
-        if (deny > 0) {
-            throw new AccessDeniedException(messages.getMessage("AbstractAccessDecisionManager.accessDenied",
-                    "Access is denied"));
-        }
+		if (deny > 0) {
+			throw new AccessDeniedException(
+					messages.getMessage("AbstractAccessDecisionManager.accessDenied", "Access is denied"));
+		}
 
-        checkAllowIfAllAbstainDecisions();
-    }
+		checkAllowIfAllAbstainDecisions();
+	}
 
 }

@@ -18,6 +18,7 @@ package br.com.anteros.security.spring;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
+import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
@@ -31,7 +32,7 @@ import org.springframework.security.core.GrantedAuthority;
  *
  */
 @SuppressWarnings("rawtypes")
-public class AnterosSecurityVoter implements AccessDecisionVoter {
+public class AnterosSecurityVoter implements AccessDecisionVoter<MethodInvocation> {
 	private static final String EMPTY_SYSTEM = "no_system";
 	private static final String EMPTY_RESOURCE = "no_resource";
 	private static final String EMPTY_ACTION = "no_action";
@@ -47,73 +48,72 @@ public class AnterosSecurityVoter implements AccessDecisionVoter {
 	}
 
 	public boolean supports(ConfigAttribute config) {
-		if ((config.getAttribute() != null) && config.getAttribute().startsWith(getActionPrefix())) {
-			return true;
-		} else {
-			return false;
-		}
+		return true;
 	}
 
 	public boolean supports(Class clazz) {
 		return true;
 	}
 
-	public int vote(Authentication authentication, Object object, Collection attributes) {
-		AnterosSecurityUser principal = (AnterosSecurityUser) authentication.getPrincipal();
-		if (!principal.isAdminNeedsPermission()){
-			return ACCESS_GRANTED;
-		}
-		
+	public int vote(Authentication authentication, MethodInvocation object, Collection attributes) {
 		int result = ACCESS_ABSTAIN;
-		Collection<? extends GrantedAuthority> authorities = extractAuthorities(authentication);
-
-		for (Object attribute : attributes) {
-			ConfigAttribute configAttribute = (ConfigAttribute) attribute;
-			if (this.supports(configAttribute)) {
+		if (authentication.getPrincipal() instanceof AnterosSecurityUser) {
+			AnterosSecurityUser principal = (AnterosSecurityUser) authentication.getPrincipal();
+			if ((!principal.isAdminNeedsPermission()) && (principal.isAdmin())) {
+				return ACCESS_GRANTED;
+			}
+			if (object instanceof ReflectiveMethodInvocation) {
 				result = ACCESS_DENIED;
+				Collection<? extends GrantedAuthority> authorities = extractAuthorities(authentication);
 
-				
-				String systemName = principal.getSystemName();
-				String resourceName = EMPTY_RESOURCE;
-				String actionName = configAttribute.getAttribute();
-				boolean requiresAdmin = false;
+				for (Object attribute : attributes) {
+					ConfigAttribute configAttribute = (ConfigAttribute) attribute;
+					if (this.supports(configAttribute)) {
+						result = ACCESS_DENIED;
 
-				if (object instanceof ReflectiveMethodInvocation) {
-					Method method = ((ReflectiveMethodInvocation) object).getMethod();
-					Class<?> declaringClass = method.getDeclaringClass();
-					if (declaringClass.isAnnotationPresent(ResourceSecured.class)) {
-						ResourceSecured annotation = declaringClass
-								.getAnnotation(ResourceSecured.class);
-						resourceName = annotation.resourceName();
-					}
-					if (method.isAnnotationPresent(ActionSecured.class)) {
-						ActionSecured secured = method.getAnnotation(ActionSecured.class);
-						actionName = secured.actionName();
-						requiresAdmin = secured.requiresAdmin();
-					}
-				}
+						String systemName = principal.getSystemName();
+						String resourceName = EMPTY_RESOURCE;
+						String actionName = configAttribute.getAttribute();
+						boolean requiresAdmin = false;
 
-				if (EMPTY_SYSTEM.equals(systemName) || EMPTY_RESOURCE.equals(resourceName)
-						|| EMPTY_ACTION.equalsIgnoreCase(actionName)) {
-					return ACCESS_DENIED;
-				}
-
-				if (requiresAdmin && (!principal.isAdmin()))
-					return ACCESS_DENIED;
-
-				for (GrantedAuthority authority : authorities) {
-					if (authority instanceof AnterosSecurityGrantedAuthority) {
-						if (((AnterosSecurityGrantedAuthority) authority)
-								.equalsTo(systemName, resourceName, actionName)) {
-							return ACCESS_GRANTED;
+						Method method = ((ReflectiveMethodInvocation) object).getMethod();
+						Class<?> declaringClass = method.getDeclaringClass();
+						if (declaringClass.isAnnotationPresent(ResourceSecured.class)) {
+							ResourceSecured annotation = declaringClass.getAnnotation(ResourceSecured.class);
+							resourceName = annotation.resourceName();
+						}
+						if (method.isAnnotationPresent(ActionSecured.class)) {
+							ActionSecured secured = method.getAnnotation(ActionSecured.class);
+							actionName = secured.actionName();
+							requiresAdmin = secured.requiresAdmin();
 						}
 
-					} else {
-						if (((SecurityConfig) attribute).getAttribute().equalsIgnoreCase(authority.getAuthority())) {
-							return ACCESS_GRANTED;
+						if (EMPTY_SYSTEM.equals(systemName) || EMPTY_RESOURCE.equals(resourceName)
+								|| EMPTY_ACTION.equalsIgnoreCase(actionName)) {
+							return ACCESS_DENIED;
+						}
+
+						if (requiresAdmin && (!principal.isAdmin()))
+							return ACCESS_DENIED;
+
+						for (GrantedAuthority authority : authorities) {
+							if (authority instanceof AnterosSecurityGrantedAuthority) {
+								if (((AnterosSecurityGrantedAuthority) authority).equalsTo(systemName, resourceName,
+										actionName)) {
+									return ACCESS_GRANTED;
+								}
+
+							} else {
+								if (((SecurityConfig) attribute).getAttribute()
+										.equalsIgnoreCase(authority.getAuthority())) {
+									return ACCESS_GRANTED;
+								}
+							}
 						}
 					}
 				}
+			} else {
+				result = ACCESS_GRANTED;
 			}
 		}
 

@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.anteros.persistence.parameter.NamedParameter;
 import br.com.anteros.persistence.session.SQLSession;
+import br.com.anteros.persistence.session.SQLSessionFactory;
 import br.com.anteros.persistence.session.service.GenericSQLService;
 import br.com.anteros.security.model.Action;
 import br.com.anteros.security.model.Resource;
@@ -33,9 +34,13 @@ import br.com.anteros.security.model.Security;
 import br.com.anteros.security.model.User;
 import br.com.anteros.security.model.System;
 import br.com.anteros.security.spring.repository.AnterosActionRepository;
+import br.com.anteros.security.spring.repository.AnterosActionRepositoryImpl;
 import br.com.anteros.security.spring.repository.AnterosResourceRepository;
+import br.com.anteros.security.spring.repository.AnterosResourceRepositoryImpl;
 import br.com.anteros.security.spring.repository.AnterosSecurityRepository;
+import br.com.anteros.security.spring.repository.AnterosSecurityRepositoryImpl;
 import br.com.anteros.security.spring.repository.AnterosSystemRepository;
+import br.com.anteros.security.spring.repository.AnterosSystemRepositoryImpl;
 
 /**
  * 
@@ -59,6 +64,16 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 	protected AnterosActionRepository anterosActionRepository;
 
 	private Map<String, AnterosSecurityUser> cacheUsers = new HashMap<String, AnterosSecurityUser>();
+	
+	
+
+	public AnterosSecurityServiceImpl() {
+		super();
+	}
+
+	public AnterosSecurityServiceImpl(SQLSessionFactory sessionFactory) {
+		super(sessionFactory);
+	}
 
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		AnterosSecurityUser result = cacheUsers.get(username);
@@ -203,5 +218,30 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 	
 	public User getUserByUserName(String username){
 		return anterosSecurityRepository.findUserByName(username);
+	}
+
+	public AnterosSecurityRepository getAnterosSecurityRepository() throws Exception {
+		if (anterosSecurityRepository==null)
+			anterosSecurityRepository = new AnterosSecurityRepositoryImpl(sessionFactory);
+		return anterosSecurityRepository;
+	}
+
+	public AnterosSystemRepository getAnterosSystemRepository() throws Exception {
+		if (anterosSystemRepository==null)
+			anterosSystemRepository = new AnterosSystemRepositoryImpl(sessionFactory);
+		return anterosSystemRepository;
+	}
+
+	public AnterosResourceRepository getAnterosResourceRepository() throws Exception {
+		if (anterosResourceRepository==null){
+			anterosResourceRepository= new AnterosResourceRepositoryImpl(sessionFactory);
+		}
+		return anterosResourceRepository;
+	}
+
+	public AnterosActionRepository getAnterosActionRepository() throws Exception {
+		if (anterosActionRepository==null)
+			anterosActionRepository = new AnterosActionRepositoryImpl(sessionFactory);
+		return anterosActionRepository;
 	}
 }

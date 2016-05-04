@@ -37,12 +37,10 @@ import br.com.anteros.core.log.Logger;
 import br.com.anteros.core.log.LoggerProvider;
 import br.com.anteros.core.scanner.ClassFilter;
 import br.com.anteros.core.scanner.ClassPathScanner;
-import br.com.anteros.core.utils.Assert;
 import br.com.anteros.core.utils.ReflectionUtils;
 import br.com.anteros.core.utils.StringUtils;
 import br.com.anteros.security.model.Action;
 import br.com.anteros.security.model.Resource;
-
 
 /**
  * 
@@ -54,6 +52,7 @@ import br.com.anteros.security.model.Resource;
 @SuppressWarnings("deprecation")
 public class AnterosSecurityManager implements AuthenticationProvider, InitializingBean {
 
+
 	protected String packageToScanSecurity;
 	protected String systemName;
 	protected String description;
@@ -62,13 +61,17 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 	private PasswordEncoder passwordEncoder = new PlaintextPasswordEncoder();
 	private SaltSource saltSource;
 	private static Logger LOG = LoggerProvider.getInstance().getLogger(AnterosSecurityManager.class.getName());
+	private boolean initialized = false;
 
 	@Autowired
 	protected AnterosSecurityService anterosSecurityService;
 
-	
+	public AnterosSecurityManager() {
+		super();
+	}
+
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		LOG.debug("Authenticate user "+authentication);
+		LOG.debug("Authenticate user " + authentication);
 		String username = authentication.getName();
 		UserDetails user = anterosSecurityService.loadUserByUsername(username, systemName);
 		if (user == null) {
@@ -76,9 +79,8 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 		}
 		if (authentication.getCredentials() == null) {
 			LOG.debug("Authentication failed: no credentials provided");
-			throw new BadCredentialsException("Bad credentials", user);
+			throw new BadCredentialsException("Bad credentials "+user.getUsername());
 		}
-	
 
 		Object salt = null;
 
@@ -90,7 +92,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 		if (!passwordEncoder.isPasswordValid(user.getPassword(), presentedPassword, salt)) {
 			LOG.debug("Authentication failed: password does not match stored value");
-			throw new BadCredentialsException("Bad credentials", user);
+			throw new BadCredentialsException("Bad credentials "+user.getUsername());
 		}
 
 		((AnterosSecurityUser) user).setSystemName(systemName);
@@ -105,20 +107,23 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 	public boolean supports(Class<?> authentication) {
 		return true;
 	}
+	
+	public void configure() throws Exception {
+		afterPropertiesSet();
+	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(systemName,
-				"Para o correto funcionamento da segurança da aplicação é necessário informar o nome do sistema.");
-		Assert.notNull(version,
-				"Para o correto funcionamento da segurança da aplicação é necessário informar a versão do sistema.");
-		scanPackages();
+		if (StringUtils.isNotEmpty(systemName) && StringUtils.isNotEmpty(version) && StringUtils.isNotEmpty(packageToScanSecurity) && (!initialized)) {
+			scanPackages();
+			initialized=true;
+		}
 	}
 
 	protected void scanPackages() {
 		if ((packageToScanSecurity != null) && (!"".equals(packageToScanSecurity))) {
 			String[] packages = StringUtils.tokenizeToStringArray(packageToScanSecurity, ", ;");
-			List<Class<?>> scanClasses = ClassPathScanner.scanClasses(new ClassFilter().packages(packages).annotation(
-					ResourceSecured.class));
+			List<Class<?>> scanClasses = ClassPathScanner
+					.scanClasses(new ClassFilter().packages(packages).annotation(ResourceSecured.class));
 
 			loadSecuredResourcesAndActions(scanClasses);
 		}
@@ -127,8 +132,8 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 	protected void loadSecuredResourcesAndActions(List<Class<?>> classes) {
 		try {
-			Action action=null;
-			Resource resource = null; 
+			Action action = null;
+			Resource resource = null;
 			br.com.anteros.security.model.System system = anterosSecurityService.getSystemByName(systemName);
 			if (system == null) {
 				system = anterosSecurityService.addSystem(systemName, description);
@@ -137,8 +142,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 				if (cl.isAnnotationPresent(ResourceSecured.class)) {
 					ResourceSecured resourceSecured = cl.getAnnotation(ResourceSecured.class);
 
-					resource = anterosSecurityService.getResourceByName(systemName,
-							resourceSecured.resourceName());
+					resource = anterosSecurityService.getResourceByName(systemName, resourceSecured.resourceName());
 					if (resource == null) {
 						resource = anterosSecurityService.addResource(system, resourceSecured.resourceName(),
 								resourceSecured.description());
@@ -149,7 +153,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 					 * Verifica ações declaradas e não salvas ou inativas
 					 */
 					Method[] methods = ReflectionUtils.getAllDeclaredMethods(cl);
-					
+
 					for (Method method : methods) {
 						if (method.isAnnotationPresent(ActionSecured.class)) {
 							boolean found = false;
@@ -223,32 +227,36 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 		return packageToScanSecurity;
 	}
 
-	public void setPackageToScanSecurity(String packageToScanSecurity) {
+	public AnterosSecurityManager setPackageToScanSecurity(String packageToScanSecurity) throws Exception {
 		this.packageToScanSecurity = packageToScanSecurity;
+		return this;
 	}
 
 	public String getSystemName() {
 		return systemName;
 	}
 
-	public void setSystemName(String systemName) {
+	public AnterosSecurityManager setSystemName(String systemName) throws Exception {
 		this.systemName = systemName;
+		return this;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public AnterosSecurityManager setDescription(String description) throws Exception {
 		this.description = description;
+		return this;
 	}
 
 	public String getVersion() {
 		return version;
 	}
 
-	public void setVersion(String version) {
+	public AnterosSecurityManager setVersion(String version) throws Exception {
 		this.version = version;
+		return this;
 	}
 
 	public PasswordEncoder getPasswordEncoder() {
@@ -271,8 +279,9 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 		return adminNeedsPermission;
 	}
 
-	public void setAdminNeedsPermission(boolean adminNeedsPermission) {
+	public AnterosSecurityManager setAdminNeedsPermission(boolean adminNeedsPermission) throws Exception {
 		this.adminNeedsPermission = adminNeedsPermission;
+	    return this;
 	}
 
 }
