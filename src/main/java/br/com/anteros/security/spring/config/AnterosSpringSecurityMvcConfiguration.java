@@ -27,6 +27,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import br.com.anteros.persistence.session.SQLSessionFactory;
 import br.com.anteros.spring.transaction.AnterosTransactionManager;
 import br.com.anteros.springWeb.converter.AnterosHttpMessageConverter;
+import br.com.anteros.springWeb.support.OpenSQLSessionInViewFilter;
 
 @Configuration
 @EnableTransactionManagement
@@ -34,8 +35,12 @@ import br.com.anteros.springWeb.converter.AnterosHttpMessageConverter;
 public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfigurerAdapter
 		 {
 
+	private static final String OPEN_SQL_SESSION_IN_VIEW_FILTER = "OpenSQLSessionInViewFilter";
 	private static final String SPRING_SECURITY_FILTER_CHAIN = "springSecurityFilterChain";
 	private static final String DISPATCHER = "dispatcher";
+	
+	@Autowired
+	private SQLSessionFactory sessionFactory;
 
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
@@ -87,6 +92,11 @@ public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfig
 		FilterRegistration.Dynamic springSecurityFilterChain = servletContext.addFilter(SPRING_SECURITY_FILTER_CHAIN,
 				DelegatingFilterProxy.class);
 		springSecurityFilterChain.addMappingForUrlPatterns(null, false, "/*");
+		
+		FilterRegistration.Dynamic openSQLSessionInViewFilterChain = servletContext.addFilter(OPEN_SQL_SESSION_IN_VIEW_FILTER,
+				OpenSQLSessionInViewFilter.class);
+		openSQLSessionInViewFilterChain.addMappingForUrlPatterns(null, false, "/*");
+		
 	}
 
 	public abstract Class<?>[] registerFirstConfigurationClasses();
@@ -128,7 +138,7 @@ public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfig
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 		super.configureMessageConverters(converters);
-		converters.add(new AnterosHttpMessageConverter());
+		converters.add(new AnterosHttpMessageConverter(sessionFactory));
 	}
 
 	@Override

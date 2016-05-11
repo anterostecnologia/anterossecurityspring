@@ -50,8 +50,8 @@ public abstract class AnterosSpringSecurityConfiguration extends WebSecurityConf
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/**").authenticated().and().formLogin().and().exceptionHandling()
-				.accessDeniedPage("/Access_Denied");
+		http.authorizeRequests().antMatchers("/resources/**").permitAll().antMatchers("/login*").permitAll()
+				.antMatchers("/**").authenticated().and().formLogin().and().csrf().disable();
 	}
 
 	@Autowired
