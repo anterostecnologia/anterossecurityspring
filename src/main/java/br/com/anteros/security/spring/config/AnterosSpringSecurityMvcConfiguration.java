@@ -86,6 +86,7 @@ public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfig
 		servletContext.addListener(new ContextLoaderListener(appContext));
 		
 		addListener(servletContext);
+		addServlet(servletContext, appContext);
 
 		Dynamic servlet = servletContext.addServlet(DISPATCHER, new DispatcherServlet(appContext));
 		servlet.addMapping("/");
@@ -117,6 +118,8 @@ public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfig
 	public abstract Class<?> globalMethodSecurityConfigurationClass();
 
 	public abstract void addListener(ServletContext servletContext);
+	
+	public abstract void addServlet(ServletContext servletContext, AnnotationConfigWebApplicationContext appContext);
 
 	public abstract String getDisplayName();
 
