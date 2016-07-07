@@ -33,7 +33,7 @@ public abstract class AnterosSpringSecurityConfiguration extends WebSecurityConf
 
 	@Autowired
 	private AnterosSecurityManager anterosSecurityManager;
-	
+
 	@Override
 	protected AuthenticationManager authenticationManager() throws Exception {
 		configureAnterosSecurityManager();
@@ -43,15 +43,15 @@ public abstract class AnterosSpringSecurityConfiguration extends WebSecurityConf
 	}
 
 	private void configureAnterosSecurityManager() throws Exception {
-		anterosSecurityManager.setDescription(description())
-		.setAdminNeedsPermission(adminNeedsPermission()).setSystemName(systemName())
-		.setVersion(version()).setPackageToScanSecurity(packageToScanSecurity()).configure();		
+		anterosSecurityManager.setDescription(description()).setAdminNeedsPermission(adminNeedsPermission())
+				.setSystemName(systemName()).setVersion(version()).setPackageToScanSecurity(packageToScanSecurity())
+				.configure();
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers("/resources/**").permitAll().antMatchers("/login*").permitAll()
-				.antMatchers("/**").authenticated().and().formLogin().and().csrf().disable();
+				.anyRequest().authenticated().and().formLogin().and().httpBasic();
 	}
 
 	@Autowired
@@ -59,6 +59,5 @@ public abstract class AnterosSpringSecurityConfiguration extends WebSecurityConf
 		configureAnterosSecurityManager();
 		auth.authenticationProvider(anterosSecurityManager);
 	}
-
 
 }
