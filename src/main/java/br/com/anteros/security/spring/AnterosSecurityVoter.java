@@ -17,6 +17,7 @@ package br.com.anteros.security.spring;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.List;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
@@ -25,6 +26,9 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+
+import br.com.anteros.core.utils.ArrayUtils;
+import br.com.anteros.core.utils.ReflectionUtils;
 
 /**
  * 
@@ -77,11 +81,20 @@ public class AnterosSecurityVoter implements AccessDecisionVoter<MethodInvocatio
 						boolean requiresAdmin = false;
 
 						Method method = ((ReflectiveMethodInvocation) object).getMethod();
-						Class<?> declaringClass = method.getDeclaringClass();
-						if (declaringClass.isAnnotationPresent(ResourceSecured.class)) {
-							ResourceSecured annotation = declaringClass.getAnnotation(ResourceSecured.class);
-							resourceName = annotation.resourceName();
+
+						Class<?> declaringClass = ((ReflectiveMethodInvocation) object).getThis().getClass();
+
+						List<Class<?>> clazzes = ArrayUtils.asList(ReflectionUtils.getAllSuperClasses(declaringClass));
+						clazzes.addAll(ArrayUtils.asList(ReflectionUtils.getAllInterfaces(declaringClass)));
+						clazzes.add(declaringClass);
+						for (Class<?> clazz : clazzes) {
+							if (clazz.isAnnotationPresent(ResourceSecured.class)) {
+								ResourceSecured annotation = clazz.getAnnotation(ResourceSecured.class);
+								resourceName = annotation.resourceName();
+								break;
+							}
 						}
+
 						if (method.isAnnotationPresent(ActionSecured.class)) {
 							ActionSecured secured = method.getAnnotation(ActionSecured.class);
 							actionName = secured.actionName();
