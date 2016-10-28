@@ -37,7 +37,7 @@ public class AnterosSecurityRepositoryImpl extends GenericSQLRepository<Security
 	}
 
 	public User findUserByName(String userName) {
-		return (User) findOne("select * from SEGURANCA where login = :plogin", new NamedParameter("plogin", userName));
+		return (User) findOneBySql("select * from SEGURANCA where login = :plogin", new NamedParameter("plogin", userName));
 	}
 
 }

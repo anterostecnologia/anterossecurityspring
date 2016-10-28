@@ -104,7 +104,7 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 	public Resource getResourceByName(String systemName, String resourceName) {
 		//TODO  Trocar por consulta via DSL para evitar problemas com nomes.
 		Resource resource = anterosResourceRepository
-				.findOne(
+				.findOneBySql(
 						"select rec.* from SEGURANCARECURSO rec, SEGURANCASISTEMA sis where sis.nome_sistema = :pnome_sistema and rec.nome_recurso = :pnome_recurso and rec.id_sistema = sis.id_sistema ",
 						NamedParameter.list().addParameter("pnome_sistema", systemName)
 								.addParameter("pnome_recurso", resourceName).values());
@@ -113,7 +113,7 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 
 	public System getSystemByName(String systemName) {
 		//TODO  Trocar por consulta via DSL para evitar problemas com nomes.
-		System system = anterosSystemRepository.findOne(
+		System system = anterosSystemRepository.findOneBySql(
 				"select sis.* from SEGURANCASISTEMA sis where sis.nome_sistema = :pnome_sistema", new NamedParameter(
 						"pnome_sistema", systemName));
 		return system;
