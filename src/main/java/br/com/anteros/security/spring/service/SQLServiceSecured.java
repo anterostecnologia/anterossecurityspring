@@ -79,11 +79,11 @@ public interface SQLServiceSecured<T,ID extends Serializable> extends SQLService
 	@ActionSecured(actionName="ACT_findOneWithPredicate", category="Busca", description="Busca uma entidade usando predicado")
 	T findOne(Predicate predicate);
 
-	@ActionSecured(actionName="ACT_findOne", category="Busca", description="Busca uma entidade")
-	T findOne(String sql);
+	@ActionSecured(actionName="ACT_findOneBySql", category="Busca", description="Busca uma entidade")
+	T findOneBySql(String sql);
 
-	@ActionSecured(actionName="ACT_findOneWithParameters", category="Busca", description="Busca uma entidade usando sql e parâmetros")
-	T findOne(String sql, Object parameters);
+	@ActionSecured(actionName="ACT_findOneBySqlWithParameters", category="Busca", description="Busca uma entidade usando sql e parâmetros")
+	T findOneBySql(String sql, Object parameters);
 
 	@ActionSecured(actionName="ACT_findAllWithPredicate", category="Busca", description="Busca todas as entidades com predicado")
 	List<T> findAll(Predicate predicate);
