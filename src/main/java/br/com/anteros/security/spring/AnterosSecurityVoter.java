@@ -27,6 +27,8 @@ import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
+import br.com.anteros.core.log.Logger;
+import br.com.anteros.core.log.LoggerProvider;
 import br.com.anteros.core.utils.ArrayUtils;
 import br.com.anteros.core.utils.ReflectionUtils;
 
@@ -40,6 +42,8 @@ public class AnterosSecurityVoter implements AccessDecisionVoter<MethodInvocatio
 	private static final String EMPTY_SYSTEM = "no_system";
 	private static final String EMPTY_RESOURCE = "no_resource";
 	private static final String EMPTY_ACTION = "no_action";
+	
+	private static Logger LOG = LoggerProvider.getInstance().getLogger(AnterosSecurityVoter.class.getName());
 
 	private String rolePrefix = "ACT_";
 
@@ -62,6 +66,11 @@ public class AnterosSecurityVoter implements AccessDecisionVoter<MethodInvocatio
 	public int vote(Authentication authentication, MethodInvocation object, Collection attributes) {
 		int result = ACCESS_ABSTAIN;
 		if (authentication.getPrincipal() instanceof AnterosSecurityUser) {
+			
+			String systemName = EMPTY_SYSTEM;
+			String resourceName = EMPTY_RESOURCE;
+			String actionName = EMPTY_ACTION;
+			
 			AnterosSecurityUser principal = (AnterosSecurityUser) authentication.getPrincipal();
 			if ((!principal.isAdminNeedsPermission()) && (principal.isAdmin())) {
 				return ACCESS_GRANTED;
@@ -75,9 +84,9 @@ public class AnterosSecurityVoter implements AccessDecisionVoter<MethodInvocatio
 					if (this.supports(configAttribute)) {
 						result = ACCESS_DENIED;
 
-						String systemName = principal.getSystemName();
-						String resourceName = EMPTY_RESOURCE;
-						String actionName = configAttribute.getAttribute();
+						systemName = principal.getSystemName();
+						resourceName = EMPTY_RESOURCE;
+						actionName = configAttribute.getAttribute();
 						boolean requiresAdmin = false;
 
 						Method method = ((ReflectiveMethodInvocation) object).getMethod();
@@ -128,8 +137,12 @@ public class AnterosSecurityVoter implements AccessDecisionVoter<MethodInvocatio
 			} else {
 				result = ACCESS_GRANTED;
 			}
+			
+			if (result == ACCESS_DENIED) {
+				LOG.info("Não foi encontrado acesso para o usuário '" + principal.getUsername() +"' no sistema '" + systemName + "', recurso '" + resourceName + "' e ação '" + actionName + "'");
+			}
 		}
-
+		
 		return result;
 	}
 

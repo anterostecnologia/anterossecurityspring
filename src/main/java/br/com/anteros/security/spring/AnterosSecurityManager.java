@@ -209,7 +209,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 						}
 
 						if (!found) {
-							if (act.getVersao().compareTo(version) <= 0) {
+							if (act.getVersao().compareTo(version) < 0) {
 								anterosSecurityService.removeActionByAllUsers(act);
 							}
 						}
