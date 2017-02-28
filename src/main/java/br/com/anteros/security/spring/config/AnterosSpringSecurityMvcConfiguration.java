@@ -69,14 +69,6 @@ public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfig
 			appContext.register(securityConfigurationClass());
 		}
 		
-		if (swaggerConfigurationClass()!=null){
-			appContext.register(swaggerConfigurationClass());
-		}
-		
-		if (jsonDocConfigurationClass()!=null){
-			appContext.register(jsonDocConfigurationClass());
-		}
-		
 		if (registerLastConfigurationClasses() != null) {
 			for (Class<?> clz : registerLastConfigurationClasses()) {
 				appContext.register(clz);
@@ -109,11 +101,7 @@ public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfig
 	
 	public abstract Class<?> mvcConfigurationClass();
 	
-	public abstract Class<?> swaggerConfigurationClass();
-	
 	public abstract Class<?> securityConfigurationClass();
-	
-	public abstract Class<?> jsonDocConfigurationClass();
 	
 	public abstract Class<?> globalMethodSecurityConfigurationClass();
 
