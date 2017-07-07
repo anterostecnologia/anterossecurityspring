@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>br.com.anteros</groupId>
 	<artifactId>Anteros-Security-Spring</artifactId>
-	<version>1.0.8</version>
+	<version>1.0.9</version>
 
 	<name>Anteros Security Spring</name>
 	<description>
@@ -51,7 +51,7 @@
 		<maven.compiler.source>1.6</maven.compiler.source>
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<springframework.version>4.2.0.RELEASE</springframework.version>
-		<springsecurity.version>4.1.0.RELEASE</springsecurity.version>
+		<springsecurity.version>4.2.0.RELEASE</springsecurity.version>
 	</properties>
 
 	<dependencies>
