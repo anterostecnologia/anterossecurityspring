@@ -15,11 +15,10 @@
  *******************************************************************************/
 package br.com.anteros.security.spring;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -31,8 +30,8 @@ import br.com.anteros.persistence.session.service.GenericSQLService;
 import br.com.anteros.security.model.Action;
 import br.com.anteros.security.model.Resource;
 import br.com.anteros.security.model.Security;
-import br.com.anteros.security.model.User;
 import br.com.anteros.security.model.System;
+import br.com.anteros.security.model.User;
 import br.com.anteros.security.spring.repository.AnterosActionRepository;
 import br.com.anteros.security.spring.repository.AnterosActionRepositoryImpl;
 import br.com.anteros.security.spring.repository.AnterosResourceRepository;
@@ -48,8 +47,9 @@ import br.com.anteros.security.spring.repository.AnterosSystemRepositoryImpl;
  *
  */
 @Service("anterosSecurityService")
-public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long> implements AnterosSecurityService,
-		InitializingBean {
+@Scope("prototype")
+public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long>
+		implements AnterosSecurityService, InitializingBean {
 
 	@Autowired
 	protected AnterosSecurityRepository anterosSecurityRepository;
@@ -63,10 +63,6 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 	@Autowired
 	protected AnterosActionRepository anterosActionRepository;
 
-	private Map<String, AnterosSecurityUser> cacheUsers = new HashMap<String, AnterosSecurityUser>();
-	
-	
-
 	public AnterosSecurityServiceImpl() {
 		super();
 	}
@@ -76,46 +72,33 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 	}
 
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		AnterosSecurityUser result = cacheUsers.get(username);
-		if (result == null) {
-			User user = anterosSecurityRepository.findUserByName(username);
-			if (user == null)
-				return null;
-			result = new AnterosSecurityUser(user);
-			user = null;
-			cacheUsers.put(username, result);
-		}
-		return result;
+		User user = anterosSecurityRepository.findUserByName(username);
+		if (user == null)
+			return null;
+		return new AnterosSecurityUser(user);
 	}
-	
+
 	public UserDetails loadUserByUsername(String username, String systemName) throws UsernameNotFoundException {
-		AnterosSecurityUser result = cacheUsers.get(username);
-		if (result == null) {
-			User user = anterosSecurityRepository.findUserByName(username);
-			if (user == null)
-				return null;
-			result = new AnterosSecurityUser(user, systemName);
-			user = null;
-			cacheUsers.put(username, result);
-		}
-		return result;
+		User user = anterosSecurityRepository.findUserByName(username);
+		if (user == null)
+			return null;
+		return new AnterosSecurityUser(user, systemName);
 	}
 
 	public Resource getResourceByName(String systemName, String resourceName) {
-		//TODO  Trocar por consulta via DSL para evitar problemas com nomes.
-		Resource resource = anterosResourceRepository
-				.findOneBySql(
-						"select rec.* from SEGURANCARECURSO rec, SEGURANCASISTEMA sis where sis.nome_sistema = :pnome_sistema and rec.nome_recurso = :pnome_recurso and rec.id_sistema = sis.id_sistema ",
-						NamedParameter.list().addParameter("pnome_sistema", systemName)
-								.addParameter("pnome_recurso", resourceName).values());
+		// TODO Trocar por consulta via DSL para evitar problemas com nomes.
+		Resource resource = anterosResourceRepository.findOneBySql(
+				"select rec.* from SEGURANCARECURSO rec, SEGURANCASISTEMA sis where sis.nome_sistema = :pnome_sistema and rec.nome_recurso = :pnome_recurso and rec.id_sistema = sis.id_sistema ",
+				NamedParameter.list().addParameter("pnome_sistema", systemName)
+						.addParameter("pnome_recurso", resourceName).values());
 		return resource;
 	}
 
 	public System getSystemByName(String systemName) {
-		//TODO  Trocar por consulta via DSL para evitar problemas com nomes.
+		// TODO Trocar por consulta via DSL para evitar problemas com nomes.
 		System system = anterosSystemRepository.findOneBySql(
-				"select sis.* from SEGURANCASISTEMA sis where sis.nome_sistema = :pnome_sistema", new NamedParameter(
-						"pnome_sistema", systemName));
+				"select sis.* from SEGURANCASISTEMA sis where sis.nome_sistema = :pnome_sistema",
+				new NamedParameter("pnome_sistema", systemName));
 		return system;
 	}
 
@@ -129,8 +112,8 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 			anterosSystemRepository.getSession().getTransaction().commit();
 		} catch (Exception e) {
 			anterosSystemRepository.getSession().getTransaction().rollback();
-			throw new AnterosSecurityException("Não foi possível salvar o sistema " + systemName + ". "
-					+ e.getMessage(), e);
+			throw new AnterosSecurityException(
+					"Não foi possível salvar o sistema " + systemName + ". " + e.getMessage(), e);
 		}
 
 		return system;
@@ -147,8 +130,8 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 			anterosResourceRepository.getSession().getTransaction().commit();
 		} catch (Exception e) {
 			anterosResourceRepository.getSession().getTransaction().rollback();
-			throw new AnterosSecurityException("Não foi possível salvar o recurso " + resourceName + ". "
-					+ e.getMessage(), e);
+			throw new AnterosSecurityException(
+					"Não foi possível salvar o recurso " + resourceName + ". " + e.getMessage(), e);
 		}
 
 		return resource;
@@ -194,11 +177,9 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 	public void removeActionByAllUsers(Action act) throws Exception {
 		try {
 			anterosActionRepository.getSession().getTransaction().begin();
-			//TODO  Trocar por consulta via DSL para evitar problemas com nomes.
-			anterosActionRepository
-					.getSession()
-					.createQuery("delete from SEGURANCAACAOACAO where id_acao = :pid_acao",
-							new NamedParameter("pid_acao", act.getId())).executeQuery();
+			// TODO Trocar por consulta via DSL para evitar problemas com nomes.
+			anterosActionRepository.getSession().createQuery("delete from SEGURANCAACAOACAO where id_acao = :pid_acao",
+					new NamedParameter("pid_acao", act.getId())).executeQuery();
 			anterosActionRepository.remove(act);
 			anterosActionRepository.getSession().getTransaction().commit();
 		} catch (Exception e) {
@@ -215,32 +196,31 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 		anterosSystemRepository.setSession(session);
 	}
 
-	
-	public User getUserByUserName(String username){
+	public User getUserByUserName(String username) {
 		return anterosSecurityRepository.findUserByName(username);
 	}
 
 	public AnterosSecurityRepository getAnterosSecurityRepository() throws Exception {
-		if (anterosSecurityRepository==null)
+		if (anterosSecurityRepository == null)
 			anterosSecurityRepository = new AnterosSecurityRepositoryImpl(sessionFactory);
 		return anterosSecurityRepository;
 	}
 
 	public AnterosSystemRepository getAnterosSystemRepository() throws Exception {
-		if (anterosSystemRepository==null)
+		if (anterosSystemRepository == null)
 			anterosSystemRepository = new AnterosSystemRepositoryImpl(sessionFactory);
 		return anterosSystemRepository;
 	}
 
 	public AnterosResourceRepository getAnterosResourceRepository() throws Exception {
-		if (anterosResourceRepository==null){
-			anterosResourceRepository= new AnterosResourceRepositoryImpl(sessionFactory);
+		if (anterosResourceRepository == null) {
+			anterosResourceRepository = new AnterosResourceRepositoryImpl(sessionFactory);
 		}
 		return anterosResourceRepository;
 	}
 
 	public AnterosActionRepository getAnterosActionRepository() throws Exception {
-		if (anterosActionRepository==null)
+		if (anterosActionRepository == null)
 			anterosActionRepository = new AnterosActionRepositoryImpl(sessionFactory);
 		return anterosActionRepository;
 	}

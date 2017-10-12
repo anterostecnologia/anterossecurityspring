@@ -17,7 +17,9 @@ package br.com.anteros.security.spring;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import br.com.anteros.core.log.Logger;
 import br.com.anteros.core.log.LoggerProvider;
@@ -52,7 +55,6 @@ import br.com.anteros.security.model.Resource;
 @SuppressWarnings("deprecation")
 public class AnterosSecurityManager implements AuthenticationProvider, InitializingBean {
 
-
 	protected String packageToScanSecurity;
 	protected String systemName;
 	protected String description;
@@ -63,8 +65,10 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 	private static Logger LOG = LoggerProvider.getInstance().getLogger(AnterosSecurityManager.class.getName());
 	private boolean initialized = false;
 
+	private Map<String, AnterosSecurityUser> cacheUsers = new HashMap<String, AnterosSecurityUser>();
+
 	@Autowired
-	protected AnterosSecurityService anterosSecurityService;
+	protected WebApplicationContext context;
 
 	public AnterosSecurityManager() {
 		super();
@@ -73,13 +77,17 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		LOG.debug("Authenticate user " + authentication);
 		String username = authentication.getName();
-		UserDetails user = anterosSecurityService.loadUserByUsername(username, systemName);
+		AnterosSecurityUser user = cacheUsers.get(username);
+		if (user == null) {
+			AnterosSecurityService anterosSecurityService = (AnterosSecurityService) context.getBean("anterosSecurityService");
+			user = (AnterosSecurityUser) anterosSecurityService.loadUserByUsername(username, systemName);
+		}
 		if (user == null) {
 			throw new BadCredentialsException("Username not found.");
 		}
 		if (authentication.getCredentials() == null) {
 			LOG.debug("Authentication failed: no credentials provided");
-			throw new BadCredentialsException("Bad credentials "+user.getUsername());
+			throw new BadCredentialsException("Bad credentials " + user.getUsername());
 		}
 
 		Object salt = null;
@@ -92,7 +100,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 		if (!passwordEncoder.isPasswordValid(user.getPassword(), presentedPassword, salt)) {
 			LOG.debug("Authentication failed: password does not match stored value");
-			throw new BadCredentialsException("Bad credentials "+user.getUsername());
+			throw new BadCredentialsException("Bad credentials " + user.getUsername());
 		}
 
 		((AnterosSecurityUser) user).setSystemName(systemName);
@@ -107,15 +115,16 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 	public boolean supports(Class<?> authentication) {
 		return true;
 	}
-	
+
 	public void configure() throws Exception {
 		afterPropertiesSet();
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		if (StringUtils.isNotEmpty(systemName) && StringUtils.isNotEmpty(version) && StringUtils.isNotEmpty(packageToScanSecurity) && (!initialized)) {
+		if (StringUtils.isNotEmpty(systemName) && StringUtils.isNotEmpty(version)
+				&& StringUtils.isNotEmpty(packageToScanSecurity) && (!initialized)) {
 			scanPackages();
-			initialized=true;
+			initialized = true;
 		}
 	}
 
@@ -132,6 +141,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 	protected void loadSecuredResourcesAndActions(List<Class<?>> classes) {
 		try {
+			AnterosSecurityService anterosSecurityService = (AnterosSecurityService) context.getBean("anterosSecurityService");
 			Action action = null;
 			Resource resource = null;
 			br.com.anteros.security.model.System system = anterosSecurityService.getSystemByName(systemName);
@@ -281,7 +291,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 	public AnterosSecurityManager setAdminNeedsPermission(boolean adminNeedsPermission) throws Exception {
 		this.adminNeedsPermission = adminNeedsPermission;
-	    return this;
+		return this;
 	}
 
 }

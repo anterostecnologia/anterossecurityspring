@@ -25,7 +25,7 @@ import br.com.anteros.persistence.session.repository.impl.GenericSQLRepository;
 import br.com.anteros.security.model.System;
 
 @Repository("anterosSystemRepository")
-@Scope("singleton")
+@Scope("prototype")
 public class AnterosSystemRepositoryImpl extends GenericSQLRepository<System, Long> implements AnterosSystemRepository {
 
 	@Autowired
