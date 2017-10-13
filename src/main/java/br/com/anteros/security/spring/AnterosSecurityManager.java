@@ -77,7 +77,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		LOG.debug("Authenticate user " + authentication);
 		String username = authentication.getName();
-		AnterosSecurityUser user = cacheUsers.get(username);
+		AnterosSecurityUser user = cacheUsers.get(username);		
 		if (user == null) {
 			AnterosSecurityService anterosSecurityService = (AnterosSecurityService) context.getBean("anterosSecurityService");
 			user = (AnterosSecurityUser) anterosSecurityService.loadUserByUsername(username, systemName);
@@ -227,6 +227,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 				}
 			}
+			anterosSecurityService = null;
 		} catch (Exception e) {
 			throw new AnterosSecurityException(e);
 		}

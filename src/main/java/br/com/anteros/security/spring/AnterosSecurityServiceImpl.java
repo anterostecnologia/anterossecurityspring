@@ -65,10 +65,12 @@ public class AnterosSecurityServiceImpl extends GenericSQLService<Security, Long
 
 	public AnterosSecurityServiceImpl() {
 		super();
+		java.lang.System.out.println("CRIOU AnterosSecurityServiceImpl");
 	}
 
 	public AnterosSecurityServiceImpl(SQLSessionFactory sessionFactory) {
 		super(sessionFactory);
+		java.lang.System.out.println("CRIOU AnterosSecurityServiceImpl");
 	}
 
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

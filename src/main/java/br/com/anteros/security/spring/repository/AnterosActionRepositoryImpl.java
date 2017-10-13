@@ -32,5 +32,7 @@ public class AnterosActionRepositoryImpl extends GenericSQLRepository<Action, Lo
 	public AnterosActionRepositoryImpl(@Qualifier("sessionFactory") SQLSessionFactory sessionFactory) throws Exception {
 		super(sessionFactory);
 	}
+	
+	
 
 }
