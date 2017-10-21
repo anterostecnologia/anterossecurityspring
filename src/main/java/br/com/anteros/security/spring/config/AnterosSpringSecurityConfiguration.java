@@ -82,5 +82,6 @@ public abstract class AnterosSpringSecurityConfiguration extends WebSecurityConf
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+	
 
 }

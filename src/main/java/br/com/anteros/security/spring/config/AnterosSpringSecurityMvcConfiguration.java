@@ -9,21 +9,27 @@ import javax.servlet.ServletRegistration.Dynamic;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.DelegatingFilterProxy;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.JstlView;
 
 import br.com.anteros.persistence.session.SQLSessionFactory;
 import br.com.anteros.spring.transaction.AnterosTransactionManager;
@@ -33,21 +39,19 @@ import br.com.anteros.springWeb.support.OpenSQLSessionInViewFilter;
 @Configuration
 @EnableTransactionManagement
 @EnableWebMvc
-public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfigurerAdapter
-		 {
+public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfigurerAdapter {
 
 	private static final String OPEN_SQL_SESSION_IN_VIEW_FILTER = "OpenSQLSessionInViewFilter";
 	private static final String SPRING_SECURITY_FILTER_CHAIN = "springSecurityFilterChain";
 	private static final String DISPATCHER = "dispatcher";
-	
+
 	@Autowired
 	private SQLSessionFactory sessionFactory;
-	
+
 	@Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
-    }
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**").allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
+	}
 
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
@@ -60,22 +64,22 @@ public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfig
 				appContext.register(clz);
 			}
 		}
-		if (persistenceConfigurationClass()!=null){
+		if (persistenceConfigurationClass() != null) {
 			appContext.register(persistenceConfigurationClass());
 		}
-		
-		if (mvcConfigurationClass()!=null){
+
+		if (mvcConfigurationClass() != null) {
 			appContext.register(mvcConfigurationClass());
 		}
-		
-		if (globalMethodSecurityConfigurationClass()!=null){
+
+		if (globalMethodSecurityConfigurationClass() != null) {
 			appContext.register(globalMethodSecurityConfigurationClass());
 		}
-		
-		if (securityConfigurationClass()!=null){
+
+		if (securityConfigurationClass() != null) {
 			appContext.register(securityConfigurationClass());
 		}
-		
+
 		if (registerLastConfigurationClasses() != null) {
 			for (Class<?> clz : registerLastConfigurationClasses()) {
 				appContext.register(clz);
@@ -83,7 +87,7 @@ public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfig
 		}
 		appContext.setServletContext(servletContext);
 		servletContext.addListener(new ContextLoaderListener(appContext));
-		
+
 		addListener(servletContext);
 		addServlet(servletContext, appContext);
 
@@ -94,26 +98,27 @@ public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfig
 		FilterRegistration.Dynamic springSecurityFilterChain = servletContext.addFilter(SPRING_SECURITY_FILTER_CHAIN,
 				DelegatingFilterProxy.class);
 		springSecurityFilterChain.addMappingForUrlPatterns(null, false, "/*");
-		
-		FilterRegistration.Dynamic openSQLSessionInViewFilterChain = servletContext.addFilter(OPEN_SQL_SESSION_IN_VIEW_FILTER,
-				OpenSQLSessionInViewFilter.class);
+
+		FilterRegistration.Dynamic openSQLSessionInViewFilterChain = servletContext
+				.addFilter(OPEN_SQL_SESSION_IN_VIEW_FILTER, OpenSQLSessionInViewFilter.class);
 		openSQLSessionInViewFilterChain.addMappingForUrlPatterns(null, false, "/*");
-		
+
 	}
 
 	public abstract Class<?>[] registerFirstConfigurationClasses();
+
 	public abstract Class<?>[] registerLastConfigurationClasses();
-	
+
 	public abstract Class<?> persistenceConfigurationClass();
-	
+
 	public abstract Class<?> mvcConfigurationClass();
-	
+
 	public abstract Class<?> securityConfigurationClass();
-	
+
 	public abstract Class<?> globalMethodSecurityConfigurationClass();
 
 	public abstract void addListener(ServletContext servletContext);
-	
+
 	public abstract void addServlet(ServletContext servletContext, AnnotationConfigWebApplicationContext appContext);
 
 	public abstract String getDisplayName();
@@ -149,10 +154,30 @@ public abstract class AnterosSpringSecurityMvcConfiguration extends WebMvcConfig
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		super.addResourceHandlers(registry);
-		registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-		registry.addResourceHandler("jsondoc-ui.html").addResourceLocations("classpath:/META-INF/resources/");
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
+	
+	@Bean
+    public InternalResourceViewResolver viewResolver(){
+        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+        viewResolver.setViewClass(JstlView.class);
+        viewResolver.setPrefix("/WEB-INF/views/");
+        viewResolver.setSuffix(".jsp");
+        return viewResolver;
+    }
+	
+	@Bean
+    public MessageSource messageSource() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        return messageSource;
+    }
 
+
+	@Bean
+	public MultipartResolver multipartResolver() {
+		CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+		return resolver;
+	}
 
 }
