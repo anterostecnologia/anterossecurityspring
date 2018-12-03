@@ -17,7 +17,7 @@ package br.com.anteros.security.spring;
 
 import org.springframework.security.core.GrantedAuthority;
 
-import br.com.anteros.security.model.Action;
+import br.com.anteros.security.store.domain.IAction;
 
 /**
  * 
@@ -28,25 +28,25 @@ public class AnterosSecurityGrantedAuthority implements GrantedAuthority {
 
 	private static final long serialVersionUID = 1L;
 	
-	private String authoriy;
+	private String authority;
 	private String systemName;
 	private String resourceName;
 	private String actionName;
 	
 	
-	public AnterosSecurityGrantedAuthority(Action action) {
+	public AnterosSecurityGrantedAuthority(IAction action) {
 		makeAuthority(action);
 	}
 
-	private void makeAuthority(Action action) {
-		this.authoriy = action.getNome();
-		this.systemName = action.getRecurso().getSistema().getNome();
-		this.resourceName = action.getRecurso().getNome();
-		this.actionName = action.getNome();
+	private void makeAuthority(IAction action) {
+		this.authority = action.getActionName();
+		this.systemName = action.getResource().getSystem().getSystemName();
+		this.resourceName = action.getResource().getResourceName();
+		this.actionName = action.getActionName();
 	}
 
 	public String getAuthority() {
-		return authoriy;
+		return authority;
 	}
 
 	public String getSystemName() {

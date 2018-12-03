@@ -1,7 +1,6 @@
 package br.com.anteros.security.spring;
 
 import br.com.anteros.core.utils.Assert;
-import br.com.anteros.persistence.session.SQLSessionFactory;
 
 public class AnterosSecurityManagerBuilder {
 
@@ -10,7 +9,6 @@ public class AnterosSecurityManagerBuilder {
 	private String systemName;
 	private String version;
 	private String description;
-	private SQLSessionFactory sessionFactory;
 
 	public AnterosSecurityManagerBuilder() {
 		super();
@@ -41,12 +39,6 @@ public class AnterosSecurityManagerBuilder {
 		return this;
 	}
 	
-	public AnterosSecurityManagerBuilder sessionFactory(SQLSessionFactory sessionFactory){
-		this.sessionFactory = sessionFactory;
-		return this;
-	}
-	
-	
 	public AnterosSecurityManager build() throws Exception{
 		Assert.notNull(systemName,
 				"Para o correto funcionamento da segurança da aplicação é necessário informar o nome do sistema.");
@@ -54,8 +46,6 @@ public class AnterosSecurityManagerBuilder {
 				"Para o correto funcionamento da segurança da aplicação é necessário informar a versão do sistema.");
 		Assert.notNull(description,
 				"Para o correto funcionamento da segurança da aplicação é necessário informar a descrição do sistema.");
-		Assert.notNull(sessionFactory,
-				"Para o correto funcionamento da segurança da aplicação é necessário informar a fábrica de sessões de persistência(SQLSessionFactory).");
 		AnterosSecurityManager securityManager = new AnterosSecurityManager();
 		securityManager.setAdminNeedsPermission(Boolean.valueOf(adminNeedsPermission));
 		securityManager.setPackageToScanSecurity(packageToScanSecurity);

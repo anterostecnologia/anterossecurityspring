@@ -43,15 +43,17 @@
 	</developers>
 
 	<properties>
-		<java.versao>1.6</java.versao>
+		<java.versao>1.8</java.versao>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<bintray.subject>edson</bintray.subject>
 		<bintray.repo>maven</bintray.repo>
-		<bintray.package>anteros-security-spring</bintray.package>
-		<maven.compiler.source>1.6</maven.compiler.source>
-		<maven.compiler.target>1.6</maven.compiler.target>
-		<springframework.version>4.2.0.RELEASE</springframework.version>
-		<springsecurity.version>4.2.0.RELEASE</springsecurity.version>
+		<bintray.package>anteros-security-springv2</bintray.package>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<springframework.version>5.0.7.RELEASE</springframework.version>
+		<springsecurity.version>5.0.6.RELEASE</springsecurity.version>
+		<springsecurityoauth2.version>2.3.3.RELEASE</springsecurityoauth2.version>
+		<jackson.library>2.9.4</jackson.library>
 	</properties>
 
 	<dependencies>
@@ -92,7 +94,7 @@
 		</dependency>
 		<dependency>
 			<groupId>br.com.anteros</groupId>
-			<artifactId>Anteros-Security</artifactId>
+			<artifactId>Anteros-Security-Store</artifactId>
 			<version>[1.0.0,)</version>
 		</dependency>
 		<dependency>
@@ -101,31 +103,40 @@
 			<version>[1.0.0,)</version>
 		</dependency>
 		<dependency>
-			<groupId>br.com.anteros</groupId>
-			<artifactId>Anteros-Spring</artifactId>
-			<version>[1.0.0,)</version>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.16</version>
 		</dependency>
+
 		<dependency>
-			<groupId>br.com.anteros</groupId>
-			<artifactId>Anteros-Spring-Web</artifactId>
-			<version>[1.0.0,)</version>
-		</dependency>		
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>c3p0</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.1.2</version>
-		</dependency>
-		
+
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.3.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security.oauth</groupId>
+			<artifactId>spring-security-oauth2</artifactId>
+			<version>${springsecurityoauth2.version}</version>
 		</dependency>
 	</dependencies>
 

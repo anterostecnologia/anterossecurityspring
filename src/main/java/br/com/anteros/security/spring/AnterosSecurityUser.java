@@ -22,8 +22,9 @@ import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import br.com.anteros.security.model.Action;
-import br.com.anteros.security.model.User;
+import br.com.anteros.security.store.domain.IAction;
+import br.com.anteros.security.store.domain.IUser;
+
 
 /**
  * Representação de um usuário dentro do sistema de segurança do Anteros.
@@ -45,32 +46,32 @@ public class AnterosSecurityUser implements UserDetails {
 	private boolean accountInactive;
 	private boolean admin;
 
-	public AnterosSecurityUser(User user) {
+	public AnterosSecurityUser(IUser user) {
 		makeUser(user);
 		user=null;
 	}
 	
-	public AnterosSecurityUser(User user, String systemName) {
+	public AnterosSecurityUser(IUser user, String systemName) {
 		this.systemName = systemName;
 		makeUser(user);
 		user=null;
 	}
 
-	private void makeUser(User user) {
+	private void makeUser(IUser user) {
 		this.userName = user.getLogin();
-		this.password = user.getSenha();
-		this.accountExpired = user.isExpirada();
-		this.accountInactive = user.getContaDesativada();
-		this.accountLocked = user.getContaBloqueada();
-		this.admin = user.getBoAdministrador();
+		this.password = user.getPassword();
+		this.accountExpired = user.isPasswordNeverExpire();
+		this.accountInactive = user.isInactiveAccount();
+		this.accountLocked = user.isBlockedAccount();
+		this.admin = user.isAdministrator();
 		actions = new HashSet<AnterosSecurityGrantedAuthority>();
-		for (Action action : user.getAcoes()) {
-			if ((systemName==null) || (action.getRecurso().getSistema().getNome().equalsIgnoreCase(systemName)))
+		for (IAction action : user.getActionList()) {
+			if ((systemName==null) || (action.getResource().getSystem().getSystemName().equalsIgnoreCase(systemName)))
 				actions.add(new AnterosSecurityGrantedAuthority(action));
 		}
-		if (user.getPerfil() != null) {
-			for (Action action : user.getPerfil().getAcoes()) {
-				if ((systemName==null) || (action.getRecurso().getSistema().getNome().equalsIgnoreCase(systemName)))
+		if (user.getUserProfile() != null) {
+			for (IAction action : user.getUserProfile().getActionsList()) {
+				if ((systemName==null) || (action.getResource().getSystem().getSystemName().equalsIgnoreCase(systemName)))
 					actions.add(new AnterosSecurityGrantedAuthority(action));
 			}
 		}
