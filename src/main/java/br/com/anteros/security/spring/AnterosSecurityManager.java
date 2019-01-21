@@ -48,6 +48,7 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.context.WebApplicationContext;
 
 import br.com.anteros.core.log.Logger;
@@ -240,6 +241,9 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 	public void afterPropertiesSet() throws Exception {
 		if (StringUtils.isNotEmpty(systemName) && StringUtils.isNotEmpty(version)
 				&& StringUtils.isNotEmpty(packageToScanSecurity) && (!initialized)) {
+			
+			securityDataStore.initializeCurrentSession();
+			
 			scanPackages();
 			initialized = true;
 		}
@@ -298,6 +302,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 							if (!found) {
 								action = securityDataStore.addAction(system, resource, actionSecured.actionName(),
 										actionSecured.category(), actionSecured.description(), version);
+								resource.addAction(action);
 							} else {
 								if (action != null) {
 									boolean save = false;

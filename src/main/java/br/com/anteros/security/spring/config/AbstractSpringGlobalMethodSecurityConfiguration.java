@@ -268,7 +268,7 @@ public abstract class AbstractSpringGlobalMethodSecurityConfiguration
 	 *
 	 * @return
 	 */
-	protected AuthenticationManager authenticationManager() throws Exception {
+	protected AuthenticationManager authenticationManager() throws Exception { 
 		if (authenticationManager == null) {
 			DefaultAuthenticationEventPublisher eventPublisher = objectPostProcessor
 					.postProcess(new DefaultAuthenticationEventPublisher());
