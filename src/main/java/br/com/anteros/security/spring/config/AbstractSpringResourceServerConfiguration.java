@@ -42,7 +42,7 @@ public abstract class AbstractSpringResourceServerConfiguration extends Resource
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-		http.requestMatchers().antMatchers(getSecuredPattern()).and().authorizeRequests().anyRequest().authenticated();
+		http.requestMatchers().antMatchers(getSecuredPattern()).and().cors().and().authorizeRequests().anyRequest().authenticated().and().csrf().disable();
 
 	}
 

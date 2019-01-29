@@ -1,8 +1,10 @@
 package br.com.anteros.security.spring.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -12,7 +14,9 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import br.com.anteros.security.spring.AnterosSecurityManager;
 
@@ -32,6 +36,7 @@ public abstract class AbstractSpringAuthServerOAuth2Configuration extends Author
 	public OAuth2AccessDeniedHandler oauthAccessDeniedHandler() {
 		return new OAuth2AccessDeniedHandler();
 	}
+	
 
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer oauthServer) {
@@ -57,5 +62,5 @@ public abstract class AbstractSpringAuthServerOAuth2Configuration extends Author
 				.userDetailsService(authenticationManager)
 				.allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);		
 	}
-
+	
 }

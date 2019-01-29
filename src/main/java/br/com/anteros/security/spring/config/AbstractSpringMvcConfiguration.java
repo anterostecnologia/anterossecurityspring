@@ -25,7 +25,8 @@ public abstract class AbstractSpringMvcConfiguration implements WebMvcConfigurer
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**").allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
+		registry.addMapping("/**")
+		.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT").allowCredentials(true).allowedOrigins("*");
 	}
 	
 	@Bean
