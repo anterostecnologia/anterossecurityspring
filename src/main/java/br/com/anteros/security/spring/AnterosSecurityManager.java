@@ -124,8 +124,8 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 		if (authentication == null) {
 			throw new InvalidTokenException("Invalid token (token not found)");
 		}
-		
-		if (tokenServices != null && ObjectUtils.isEmpty(authentication.getCredentials())) {	
+
+		if (tokenServices != null && ObjectUtils.isEmpty(authentication.getCredentials())) {
 			String token = (String) authentication.getPrincipal();
 			OAuth2Authentication auth = tokenServices.loadAuthentication(token);
 			if (auth == null) {
@@ -154,7 +154,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 			if (auth.getPrincipal() instanceof AnterosSecurityUser) {
 				username = ((AnterosSecurityUser) auth.getPrincipal()).getUsername();
 			} else {
-				username = auth.getPrincipal() + "";				
+				username = auth.getPrincipal() + "";
 			}
 			user = cacheUsers.get(username);
 			if (user == null) {
@@ -241,9 +241,9 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 	public void afterPropertiesSet() throws Exception {
 		if (StringUtils.isNotEmpty(systemName) && StringUtils.isNotEmpty(version)
 				&& StringUtils.isNotEmpty(packageToScanSecurity) && (!initialized)) {
-			
+
 			securityDataStore.initializeCurrentSession();
-			
+
 			scanPackages();
 			initialized = true;
 		}
