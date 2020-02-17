@@ -52,7 +52,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<springframework.version>5.0.7.RELEASE</springframework.version>
-		<springsecurity.version>5.0.6.RELEASE</springsecurity.version>
+		<springsecurity.version>5.2.2.RELEASE</springsecurity.version>
 		<springsecurityoauth2.version>2.3.3.RELEASE</springsecurityoauth2.version>
 		<jackson.library>2.9.8</jackson.library>
 	</properties>
