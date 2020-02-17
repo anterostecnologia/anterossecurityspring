@@ -246,6 +246,8 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 			scanPackages();
 			initialized = true;
+			
+			securityDataStore.clearCurrentSession();
 		}
 	}
 
