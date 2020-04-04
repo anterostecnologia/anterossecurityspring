@@ -295,7 +295,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 							for (IAction act : resource.getActionList()) {
 								if (act.getActionName().equalsIgnoreCase(actionSecured.actionName())) {
 									found = true;
-									active = act.isActive();
+									active = act.isActionActive();
 									action = act;
 									break;
 								}
@@ -309,7 +309,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 								if (action != null) {
 									boolean save = false;
 									if (!active) {
-										action.setActive(true);
+										action.setActiveAction(true);
 										save = true;
 									}
 									if (!(action.getCategory().equalsIgnoreCase(actionSecured.category()))) {
