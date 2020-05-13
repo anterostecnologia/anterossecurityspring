@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>br.com.anteros</groupId>
 	<artifactId>Anteros-Security-Spring</artifactId>
-	<version>2.0.5</version>
+	<version>2.0.6</version>
 
 	<name>Anteros Security Spring</name>
 	<description>
@@ -146,6 +146,19 @@
 			<version>2.1.2.RELEASE</version>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>local-REPO</id>
+			<url>http://vps4657.publiccloud.com.br:8082/artifactory/libs-release/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<profiles>
 		<profile>
@@ -318,7 +331,7 @@
 				</repository>
 			</repositories>
 		</profile>
-		
+
 		<profile>
 			<id>local</id>
 			<build>
@@ -364,6 +377,12 @@
 					</plugins>
 				</pluginManagement>
 			</build>
+			<distributionManagement>
+				<repository>
+					<id>local-REPO</id>
+					<url>http://vps4657.publiccloud.com.br:8082/artifactory/libs-release-local</url>
+				</repository>
+			</distributionManagement>
 
 		</profile>
 	</profiles>
