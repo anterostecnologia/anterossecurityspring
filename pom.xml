@@ -54,9 +54,10 @@
 		<springframework.version>5.0.7.RELEASE</springframework.version>
 		<springsecurity.version>5.0.6.RELEASE</springsecurity.version>
 		<springsecurityoauth2.version>2.3.3.RELEASE</springsecurityoauth2.version>
-		<jackson.library>[2.9.10.1,)</jackson.library>
+		<jackson.library>2.9.10</jackson.library>
 	</properties>
-
+	
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -149,6 +150,15 @@
 
 	<repositories>
 		<repository>
+			<id>oss-snapshots-repo</id>
+			<name>Sonatype OSS Maven Repository</name>
+			<url>https://oss.sonatype.org/content/groups/public</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
 			<id>local-REPO</id>
 			<url>http://vps4657.publiccloud.com.br:8082/artifactory/libs-release/</url>
 			<releases>
@@ -158,7 +168,24 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>bintray-puravida-software-repo</id>
+			<name>bintray</name>
+			<url>https://dl.bintray.com/puravida-software/repo</url>
+		</repository>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>spring</id>
+			<name>extensions</name>
+			<url>https://repo.spring.io/release</url>
+		</repository>
 	</repositories>
+
 
 	<profiles>
 		<profile>
