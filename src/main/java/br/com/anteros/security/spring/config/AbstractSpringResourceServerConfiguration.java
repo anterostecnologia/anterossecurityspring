@@ -3,6 +3,7 @@ package br.com.anteros.security.spring.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
@@ -42,7 +43,12 @@ public abstract class AbstractSpringResourceServerConfiguration extends Resource
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-		http.requestMatchers().antMatchers(getSecuredPattern()).and().cors().and().authorizeRequests().anyRequest().authenticated().and().csrf().disable();
+		http.requestMatchers().antMatchers(getSecuredPattern())
+		.and().cors()
+		.and().authorizeRequests()
+		.anyRequest().authenticated()
+		.and().csrf().disable();
+		//.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 	}
 

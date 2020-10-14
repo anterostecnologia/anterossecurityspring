@@ -48,12 +48,6 @@ public abstract class AbstractSpringAuthServerOAuth2Configuration extends Author
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		System.out.println(getOAuth2ClientPasswordEncoder().encode("senha_secreta"));
 		clients.withClientDetails(authenticationManager);
-//		clients.inMemory().withClient("spring-security-oauth2-read-write-client")
-//				.authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
-//				.authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT").scopes("read", "write", "trust")
-//				.secret("$2a$04$soeOR.QFmClXeFIrhJVLWOQxfHjsJLSpWrU1iGxcMGdu.a5hvfY4W")
-//				.accessTokenValiditySeconds(10800).// Access token is only valid for 2 minutes.
-//				refreshTokenValiditySeconds(2592000);// Refresh token is only valid for 10 minutes.
 	}
 
 	@Override
