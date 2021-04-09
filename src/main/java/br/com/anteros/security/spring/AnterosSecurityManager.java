@@ -162,6 +162,13 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 				if (userDomain != null) {
 					user = new AnterosSecurityUser(userDomain, systemName);
 				}
+				if (userDomain.isBlockedAccount()) {
+					throw new UserBlockedAccountException("Blocked account " + user.getUsername());
+				}
+				if (userDomain.isInactiveAccount()) {
+					throw new UserInactiveAccountException("Inactive account " + user.getUsername());
+				}
+				
 			}
 			if (user == null) {
 				throw new BadCredentialsException("Username not found.");
