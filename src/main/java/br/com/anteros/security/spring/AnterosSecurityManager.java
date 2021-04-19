@@ -158,7 +158,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 			}
 			user = cacheUsers.get(username);
 			if (user == null) {
-				IUser userDomain = securityDataStore.getUserByUserName(username);
+				IUser userDomain = securityDataStore.getUserByUserNameWithPassword(username);
 				if (userDomain != null) {
 					user = new AnterosSecurityUser(userDomain, systemName);
 				}
@@ -191,7 +191,7 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 			username = authentication.getName();
 			AnterosSecurityUser user = cacheUsers.get(username);
 			if (user == null) {
-				IUser userDomain = securityDataStore.getUserByUserName(username);
+				IUser userDomain = securityDataStore.getUserByUserNameWithPassword(username);
 				if (userDomain != null) {
 					user = new AnterosSecurityUser(userDomain, systemName);
 				}
