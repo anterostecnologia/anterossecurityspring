@@ -89,7 +89,6 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 	private static Logger LOG = LoggerProvider.getInstance().getLogger(AnterosSecurityManager.class.getName());
 	private boolean initialized = false;
 
-	private Map<String, AnterosSecurityUser> cacheUsers = new HashMap<String, AnterosSecurityUser>();
 
 	@Autowired
 	protected WebApplicationContext context;
@@ -122,21 +121,21 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 
 		String username = "";
 		if (authentication == null) {
-			throw new InvalidTokenException("Invalid token (token not found)");
+			throw new InvalidTokenException("Token inválido (token não encontrado)");
 		}
 
 		if (tokenServices != null && ObjectUtils.isEmpty(authentication.getCredentials())) {
 			String token = (String) authentication.getPrincipal();
 			OAuth2Authentication auth = tokenServices.loadAuthentication(token);
 			if (auth == null) {
-				throw new InvalidTokenException("Invalid token: " + token);
+				throw new InvalidTokenException("Token inválido: " + token);
 			}
 
 			Collection<String> resourceIds = auth.getOAuth2Request().getResourceIds();
 			if (resourceId != null && resourceIds != null && !resourceIds.isEmpty()
 					&& !resourceIds.contains(resourceId)) {
 				throw new OAuth2AccessDeniedException(
-						"Invalid token does not contain resource id (" + resourceId + ")");
+						"Token inválido não contém id de recurso (" + resourceId + ")");
 			}
 
 			if (authentication.getDetails() instanceof OAuth2AuthenticationDetails) {
@@ -156,22 +155,18 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 			} else {
 				username = auth.getPrincipal() + "";
 			}
-			user = cacheUsers.get(username);
-			if (user == null) {
-				IUser userDomain = securityDataStore.getUserByUserNameWithPassword(username);
-				if (userDomain != null) {
-					user = new AnterosSecurityUser(userDomain, systemName);
-				}
-				if (userDomain.isBlockedAccount()) {
-					throw new UserBlockedAccountException("Blocked account " + user.getUsername());
-				}
-				if (userDomain.isInactiveAccount()) {
-					throw new UserInactiveAccountException("Inactive account " + user.getUsername());
-				}
-				
+			IUser userDomain = securityDataStore.getUserByUserNameWithPassword(username);
+			if (userDomain != null) {
+				user = new AnterosSecurityUser(userDomain, systemName);
+			}
+			if (userDomain.isBlockedAccount()) {
+				throw new BadCredentialsException("Conta bloqueada " + user.getUsername());
+			}
+			if (userDomain.isInactiveAccount()) {
+				throw new BadCredentialsException("Conta inativa " + user.getUsername());
 			}
 			if (user == null) {
-				throw new BadCredentialsException("Username not found.");
+				throw new BadCredentialsException("Usuário não encontrado.");
 			}
 			if (authentication.getCredentials() == null) {
 				LOG.debug("Authentication failed: no credentials provided");
@@ -189,26 +184,24 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 		} else {
 			LOG.debug("Authenticate user " + authentication);
 			username = authentication.getName();
-			AnterosSecurityUser user = cacheUsers.get(username);
-			if (user == null) {
-				IUser userDomain = securityDataStore.getUserByUserNameWithPassword(username);
-				if (userDomain != null) {
-					user = new AnterosSecurityUser(userDomain, systemName);
-				}
+			AnterosSecurityUser user = null;
+			IUser userDomain = securityDataStore.getUserByUserNameWithPassword(username);
+			if (userDomain != null) {
+				user = new AnterosSecurityUser(userDomain, systemName);
 			}
 			if (user == null) {
-				throw new BadCredentialsException("Username not found.");
+				throw new BadCredentialsException("Usuário não encontrado.");
 			}
 			if (authentication.getCredentials() == null) {
 				LOG.debug("Authentication failed: no credentials provided");
-				throw new BadCredentialsException("Bad credentials " + user.getUsername());
+				throw new BadCredentialsException("Credenciais incorretas " + user.getUsername());
 			}
 
 			String presentedPassword = authentication.getCredentials().toString();
 
 			if (!user.getPassword().equals(presentedPassword)) {
 				LOG.debug("Authentication failed: password does not match stored value");
-				throw new BadCredentialsException("Bad credentials " + user.getUsername());
+				throw new BadCredentialsException("Credenciais incorretas " + user.getUsername());
 			}
 
 			((AnterosSecurityUser) user).setSystemName(systemName);
@@ -226,13 +219,13 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 		try {
 			client = this.loadClientByClientId(auth.getOAuth2Request().getClientId());
 		} catch (ClientRegistrationException e) {
-			throw new OAuth2AccessDeniedException("Invalid token contains invalid client id");
+			throw new OAuth2AccessDeniedException("O token inválido contém um ID de cliente inválido");
 		}
 		Set<String> allowed = client.getScope();
 		for (String scope : auth.getOAuth2Request().getScope()) {
 			if (!allowed.contains(scope)) {
 				throw new OAuth2AccessDeniedException(
-						"Invalid token contains disallowed scope (" + scope + ") for this client");
+						"Token inválido contém escopo não permitido (" + scope + ") para este cliente");
 			}
 		}
 	}

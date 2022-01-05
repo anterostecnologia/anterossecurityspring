@@ -46,7 +46,6 @@ public abstract class AbstractSpringAuthServerOAuth2Configuration extends Author
 
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		System.out.println(getOAuth2ClientPasswordEncoder().encode("senha_secreta"));
 		clients.withClientDetails(authenticationManager);
 	}
 

@@ -1,33 +1,14 @@
 package br.com.anteros.security.spring;
 
-public class UserBlockedAccountException extends RuntimeException {
+import org.springframework.security.core.AuthenticationException;
 
-	public UserBlockedAccountException() {
-		super();
-		// TODO Auto-generated constructor stub
+public class UserBlockedAccountException extends AuthenticationException {
+
+	public UserBlockedAccountException(String msg, Throwable t) {
+		super(msg, t);
 	}
 
-	public UserBlockedAccountException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
+	public UserBlockedAccountException(String msg) {
+		super(msg);
 	}
-
-	public UserBlockedAccountException(String message, Throwable cause) {
-		super(message, cause);
-		// TODO Auto-generated constructor stub
-	}
-
-	public UserBlockedAccountException(String message) {
-		super(message);
-		// TODO Auto-generated constructor stub
-	}
-
-	public UserBlockedAccountException(Throwable cause) {
-		super(cause);
-		// TODO Auto-generated constructor stub
-	}
-	
-	
-
 }

@@ -1,30 +1,13 @@
 package br.com.anteros.security.spring;
 
-public class UserInactiveAccountException extends RuntimeException {
+import org.springframework.security.core.AuthenticationException;
 
-	public UserInactiveAccountException() {
-		// TODO Auto-generated constructor stub
+public class UserInactiveAccountException extends AuthenticationException {
+	public UserInactiveAccountException(String msg, Throwable t) {
+		super(msg, t);
 	}
 
-	public UserInactiveAccountException(String message) {
-		super(message);
-		// TODO Auto-generated constructor stub
+	public UserInactiveAccountException(String msg) {
+		super(msg);
 	}
-
-	public UserInactiveAccountException(Throwable cause) {
-		super(cause);
-		// TODO Auto-generated constructor stub
-	}
-
-	public UserInactiveAccountException(String message, Throwable cause) {
-		super(message, cause);
-		// TODO Auto-generated constructor stub
-	}
-
-	public UserInactiveAccountException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
-	}
-
 }
