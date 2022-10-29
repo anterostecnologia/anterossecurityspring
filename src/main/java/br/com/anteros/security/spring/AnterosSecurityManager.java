@@ -125,10 +125,15 @@ public class AnterosSecurityManager implements AuthenticationProvider, Initializ
 		}
 
 		if (tokenServices != null && ObjectUtils.isEmpty(authentication.getCredentials())) {
-			String token = (String) authentication.getPrincipal();
-			OAuth2Authentication auth = tokenServices.loadAuthentication(token);
-			if (auth == null) {
-				throw new InvalidTokenException("Token inválido: " + token);
+			OAuth2Authentication auth = null;
+			if (authentication instanceof OAuth2Authentication) {
+				auth = (OAuth2Authentication) authentication;
+			} else {
+				String token = (String) authentication.getPrincipal();
+				auth = tokenServices.loadAuthentication(token);
+				if (auth == null) {
+					throw new InvalidTokenException("Token inválido: " + token);
+				}
 			}
 
 			Collection<String> resourceIds = auth.getOAuth2Request().getResourceIds();
